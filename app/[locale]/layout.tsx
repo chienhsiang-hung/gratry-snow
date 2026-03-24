@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
-import "../globals.css"; // 注意：因為多了一層 [locale]，這裡的路徑要改成 ../
+import "../globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
@@ -34,8 +34,9 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  // Next.js 15+ params 為 Promise
   const { locale } = await params;
+  setRequestLocale(locale);
+
   const messages = await getMessages();
 
   return (
