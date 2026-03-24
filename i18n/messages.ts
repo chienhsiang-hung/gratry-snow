@@ -1,7 +1,7 @@
 const translations = {
   title: { 
-    en: 'Snowboard Tricks Hub', 
-    zh: '滑雪平花技巧庫' 
+    en: 'Gratry Snow', 
+    zh: '單板平花滑雪' 
   },
   description: { 
     en: 'My exclusive snowboard ground tricks notes and video library', 
