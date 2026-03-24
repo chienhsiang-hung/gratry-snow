@@ -1,14 +1,13 @@
 import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin();
+// Pass the correct path to your request.ts file here
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   basePath: '/gratry-snow',
-  
-  // GitHub Pages 不支援 Next.js 預設的圖片優化 API，如果你有使用 <Image /> 元件，需要加上這個設定
-  images: {
+    images: {
     unoptimized: true,
   },
 };
