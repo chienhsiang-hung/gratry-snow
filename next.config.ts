@@ -1,9 +1,6 @@
 import createNextIntlPlugin from 'next-intl/plugin';
-import path from 'node:path';
 
-const i18nPath = './' + path.relative(process.cwd(), path.resolve(process.cwd(), 'i18n/request.ts'));
-
-const withNextIntl = createNextIntlPlugin(i18nPath);
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
