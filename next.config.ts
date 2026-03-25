@@ -1,17 +1,18 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Pass the correct path to your request.ts file here
-const withNextIntl = createNextIntlPlugin();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const withNextIntl = createNextIntlPlugin(
+  path.resolve(__dirname, './i18n/request.ts')
+);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
   basePath: '/gratry-snow',
     images: {
-    unoptimized: true,
-  },
-  experimental: {
-    turbo: {} 
+      unoptimized: true,
   }
 };
 
