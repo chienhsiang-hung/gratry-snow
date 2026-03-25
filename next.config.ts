@@ -10,7 +10,7 @@ const nextConfig = {
     images: {
       unoptimized: true,
   },
-  turbo: {
+  turbopack: {
     resolveAlias: {
       'next-intl/config': path.resolve(process.cwd(), 'i18n/request.ts'),
     },
