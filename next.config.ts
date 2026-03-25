@@ -1,11 +1,7 @@
 import createNextIntlPlugin from 'next-intl/plugin';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const withNextIntl = createNextIntlPlugin(
-  path.resolve(__dirname, './i18n/request.ts')
-);
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -13,6 +9,11 @@ const nextConfig = {
   basePath: '/gratry-snow',
     images: {
       unoptimized: true,
+  },
+  turbo: {
+    resolveAlias: {
+      'next-intl/config': path.resolve(process.cwd(), 'i18n/request.ts'),
+    },
   }
 };
 
