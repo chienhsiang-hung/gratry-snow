@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import AuthButton from "@/components/auth-button";
 
 export default async function Home({
   params
@@ -21,6 +22,7 @@ export default async function Home({
       <div className="flex gap-4">
         <ThemeToggle />
         <LanguageSwitcher />
+        <AuthButton />
       </div>
     </main>
   );
