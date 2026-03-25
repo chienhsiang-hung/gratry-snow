@@ -10,6 +10,9 @@ const nextConfig = {
     images: {
     unoptimized: true,
   },
+  experimental: {
+    turbo: {} 
+  }
 };
 
 export default withNextIntl(nextConfig as import('next').NextConfig);
