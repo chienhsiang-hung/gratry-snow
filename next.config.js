@@ -6,9 +6,10 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig = {
   output: 'export',
   basePath: '/gratry-snow',
-    images: {
-      unoptimized: true,
-  }
+  images: {
+    unoptimized: true,
+  },
+  trailingSlash: true,
 };
 
 export default withNextIntl(nextConfig);
