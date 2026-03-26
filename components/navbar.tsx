@@ -42,19 +42,23 @@ export default function Navbar() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px]">
-              <SheetHeader className="text-left mb-6">
-                <SheetTitle className="font-bold text-lg">Gratry Snow</SheetTitle>
+            <SheetContent side="left" className="w-[280px] sm:w-[350px] px-6">
+              <SheetHeader className="text-left mb-8">
+                <SheetTitle className="font-bold text-xl tracking-tight">
+                  Gratry Snow
+                </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-4">
+              <nav className="flex flex-col gap-5">
                 {navItems.map((item) => (
                   <Link 
                     key={item.href}
                     href={item.href} 
                     onClick={closeSheet}
                     className={cn(
-                      "text-sm font-medium transition-colors hover:text-primary",
-                      pathname === item.href ? "text-foreground" : "text-muted-foreground"
+                      "text-base font-medium py-2 transition-colors border-l-2 pl-4 -ml-4",
+                      pathname === `${item.href}/`
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {item.label}
@@ -79,7 +83,7 @@ export default function Navbar() {
                 href={item.href} 
                 className={cn(
                   "transition-colors hover:text-foreground/80",
-                  pathname === item.href ? "text-foreground" : "text-muted-foreground"
+                  pathname === `${item.href}/` ? "text-foreground" : "text-muted-foreground"
                 )}
               >
                 {item.label}
