@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Lock, Globe, Play, Loader2, Calendar } from 'lucide-react'
+import { TrickPlayer } from './trick-player'
 
 type Trick = {
   id: string
@@ -74,13 +75,7 @@ function TrickCard({ trick }: { trick: Trick }) {
       {/* 影片區塊 (16:9 比例) */}
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
         {isPlaying ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${trick.video_id}?autoplay=1&rel=0`}
-            title={trick.name}
-            className="h-full w-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          <TrickPlayer videoId={trick.video_id} />
         ) : (
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
             {/* 使用 hqdefault.jpg 取得高畫質縮圖 */}
