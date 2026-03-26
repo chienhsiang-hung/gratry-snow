@@ -72,13 +72,16 @@ function TrickCard({ trick }: { trick: Trick }) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
-      {/* 影片區塊 (16:9 比例) */}
-      <div className="relative aspect-video w-full overflow-hidden bg-muted">
-        {isPlaying ? (
+      {isPlaying ? (
+        // 播放狀態：讓 TrickPlayer 自由展開，不限制高度
+        <div className="w-full bg-muted/20 p-3">
           <TrickPlayer videoId={trick.video_id} />
-        ) : (
+        </div>
+      ) : (
+        // 未播放狀態：嚴格套用 16:9 (aspect-video) 顯示精美縮圖
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
-            {/* 使用 hqdefault.jpg 取得高畫質縮圖 */}
+            {/* 縮圖 */}
             <img 
               src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
               alt={trick.name}
@@ -90,7 +93,6 @@ function TrickCard({ trick }: { trick: Trick }) {
                 <Play className="h-6 w-6 ml-1" />
               </div>
             </div>
-            
             {/* 右上角隱私標籤 */}
             <div className="absolute right-3 top-3 rounded-md bg-background/90 px-2.5 py-1 text-xs font-medium backdrop-blur-md">
               {trick.privacy === 'private' ? (
@@ -100,10 +102,10 @@ function TrickCard({ trick }: { trick: Trick }) {
               )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* 資訊區塊 */}
+      {/* 資訊區塊保持不變 */}
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-3 flex items-center justify-between">
           <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
