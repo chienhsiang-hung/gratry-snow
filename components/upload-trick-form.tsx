@@ -1,5 +1,6 @@
 'use client'
 
+import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, Lock, Globe, X } from 'lucide-react';
@@ -11,6 +12,7 @@ export function UploadTrickForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,9 +21,74 @@ export function UploadTrickForm() {
       alert('請填寫必填欄位並選擇影片！');
       return;
     }
+
+    setIsUploading(true);
     
-    // 這裡保留給下一步實作 YouTube API 直傳邏輯
-    console.log('準備上傳:', { file, privacy, category, trickName, title, description });
+    try {
+      // 1. 取得當前 Session 中的 Google Provider Token
+      const { data: { session } } = await supabase.auth.getSession();
+      const providerToken = session?.provider_token;
+
+      if (!providerToken) {
+        alert('無法取得 Google 授權 Token。請嘗試登出並重新登入，確保有同意 YouTube 權限！');
+        setIsUploading(false);
+        return;
+      }
+
+      // 2. 準備 YouTube 影片的 Metadata (中繼資料)
+      const metadata = {
+        snippet: {
+          title: title || trickName, // 若沒填標題，預設用招式名稱
+          description: description || `招式: ${trickName}\n分類: ${category}\n\nUploaded via Gratry Snow`,
+          categoryId: '17', // 17 代表 YouTube 的 "Sports" (體育) 類別
+        },
+        status: {
+          // 私人筆記設為 private。
+          // 公開分享建議設為 unlisted (非公開)，這樣網站能正常播放，但不會把使用者的個人頻道洗版。
+          privacyStatus: privacy === 'private' ? 'private' : 'unlisted', 
+          embeddable: true, // 允許在你的網站上透過 iframe 嵌入播放
+        },
+      };
+
+      // 3. 建立 Multipart FormData
+      const formData = new FormData();
+      formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      formData.append('file', file);
+
+      // 4. 發送請求至 YouTube Data API
+      const response = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${providerToken}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('YouTube API Error:', data);
+        throw new Error(data.error?.message || '上傳失敗');
+      }
+
+      const videoId = data.id;
+      console.log('上傳成功！YouTube Video ID:', videoId);
+      alert(`🎉 影片上傳成功！YouTube ID: ${videoId}`);
+
+      // TODO: 下一步，我們要將 videoId、category、trickName 等資料寫入 Supabase 資料庫！
+      
+      // 清空表單
+      // clearFile();
+      // setTrickName('');
+      // setTitle('');
+      // setDescription('');
+
+    } catch (error: any) {
+      console.error(error);
+      alert(`發生錯誤: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const clearFile = () => {
@@ -152,8 +219,8 @@ export function UploadTrickForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-base" size="lg">
-        確認並上傳
+      <Button type="submit" className="w-full text-base" size="lg" disabled={isUploading}>
+        {isUploading ? '正在上傳至 YouTube...' : '確認並上傳'}
       </Button>
     </form>
   );

@@ -25,7 +25,8 @@ export default function AuthButton() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}${window.location.pathname}`
+        redirectTo: `${window.location.origin}${window.location.pathname}`,
+        scopes: 'https://www.googleapis.com/auth/youtube.upload'
       }
     });
   };
