@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
+import Navbar from "@/components/navbar";
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
@@ -39,7 +40,7 @@ export default async function RootLayout({
 
   const messages = await getMessages();
 
-  return (
+return (
     <html
       lang={locale}
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
@@ -53,7 +54,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            {children}
+            {/* 將內容用 flex 容器包起來，加入 Navbar */}
+            <div className="relative flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1 flex flex-col">
+                {children}
+              </main>
+            </div>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
