@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { TrickList } from "@/components/trick-list";
 
 export default async function Home({
   params
@@ -15,6 +16,8 @@ export default async function Home({
         <h1 className="text-4xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground">{t("description")}</p>
       </div>
+
+      <TrickList />
     </main>
   );
 }
