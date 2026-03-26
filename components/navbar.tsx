@@ -22,10 +22,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  // 定義導航項目，方便統一管理
   const navItems = [
     { href: "/upload", label: t('upload_trick') },
-    // { href: "/explore", label: t('explore') }, // 方便未來擴充
   ];
 
   const closeSheet = () => setIsOpen(false);
@@ -42,23 +40,23 @@ export default function Navbar() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[350px] px-6">
-              <SheetHeader className="text-left mb-8">
+            <SheetContent side="left" className="w-[280px] p-0"> {/* 移除預設 Pading 重新定義 */}
+              <SheetHeader className="p-6 text-left border-b">
                 <SheetTitle className="font-bold text-xl tracking-tight">
                   Gratry Snow
                 </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-5">
+              <nav className="flex flex-col pt-2">
                 {navItems.map((item) => (
                   <Link 
                     key={item.href}
                     href={item.href} 
                     onClick={closeSheet}
                     className={cn(
-                      "text-base font-medium py-2 transition-colors border-l-2 pl-4 -ml-4",
+                      "flex items-center px-6 py-4 text-sm font-medium transition-colors hover:bg-accent",
                       pathname === `${item.href}/`
-                        ? "border-primary text-foreground"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-primary" // 選中時背景加深，字體變色
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {item.label}
@@ -82,8 +80,8 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href} 
                 className={cn(
-                  "transition-colors hover:text-foreground/80",
-                  pathname === `${item.href}/` ? "text-foreground" : "text-muted-foreground"
+                  "transition-colors hover:text-foreground/80 py-1",
+                  pathname === `${item.href}/` ? "text-foreground font-semibold" : "text-muted-foreground"
                 )}
               >
                 {item.label}
