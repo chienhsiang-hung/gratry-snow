@@ -1,17 +1,17 @@
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import AuthButton from "@/components/auth-button";
 
 export default function Navbar() {
   const locale = useLocale();
+  const t = useTranslations();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
         
-        {/* 左側：Logo 與導覽連結 */}
         <div className="flex items-center gap-6">
           <Link href={`/${locale}`} className="flex items-center space-x-2">
             <span className="font-bold text-lg tracking-tight">Gratry Snow</span>
@@ -21,17 +21,15 @@ export default function Navbar() {
               href={`/${locale}/upload`} 
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
-              Upload Trick
+              {t('upload_trick')} {/* 使用翻譯 */}
             </Link>
-            {/* 未來可以在這裡繼續加其他頁面的連結 */}
           </nav>
         </div>
 
-        {/* 右側：工具與個人資料 */}
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
           <ThemeToggle />
-          <div className="h-4 w-px bg-border mx-1"></div> {/* 分隔線 */}
+          <div className="h-4 w-px bg-border mx-1"></div>
           <AuthButton />
         </div>
       </div>

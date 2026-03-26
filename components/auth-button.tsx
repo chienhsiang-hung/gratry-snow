@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { User } from "@supabase/supabase-js";
 import { LogIn, LogOut, User as UserIcon } from 'lucide-react';
+import { useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import {
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -44,15 +46,19 @@ export default function AuthButton() {
   };
 
   if (user) {
-    // 取得 Google 登入提供的大頭貼
     const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
 
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-9 w-9 rounded-full overflow-hidden border">
+          <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 overflow-hidden border">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="Avatar" className="object-cover w-full h-full" />
+              <img 
+                src={avatarUrl} 
+                alt="Avatar" 
+                className="h-full w-full object-cover" 
+                referrerPolicy="no-referrer"
+              />
             ) : (
               <UserIcon className="h-5 w-5 text-muted-foreground" />
             )}
@@ -68,7 +74,7 @@ export default function AuthButton() {
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
+            <span>{t('log_out')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -82,8 +88,8 @@ export default function AuthButton() {
       className="group flex items-center gap-2 rounded-full px-4 transition-all"
     >
       <LogIn className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-      <span className="hidden text-sm font-medium sm:inline-block">Log In</span>
-      <span className="sr-only sm:hidden">Sign in with Google</span>
+      <span className="hidden text-sm font-medium sm:inline-block">{t('log_in')}</span>
+      <span className="sr-only sm:hidden">{t('sign_in_google')}</span>
     </Button>
   );
 }
