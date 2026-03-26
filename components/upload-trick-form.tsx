@@ -45,7 +45,7 @@ export function UploadTrickForm() {
         status: {
           // 私人筆記設為 private。
           // 公開分享建議設為 unlisted (非公開)，這樣網站能正常播放，但不會把使用者的個人頻道洗版。
-          privacyStatus: privacy === 'private' ? 'private' : 'unlisted', 
+          privacyStatus: 'unlisted', 
           embeddable: true, // 允許在你的網站上透過 iframe 嵌入播放
         },
       };
