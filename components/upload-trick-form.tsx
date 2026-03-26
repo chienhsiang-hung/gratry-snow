@@ -75,13 +75,46 @@ export function UploadTrickForm() {
       console.log('上傳成功！YouTube Video ID:', videoId);
       alert(`🎉 影片上傳成功！YouTube ID: ${videoId}`);
 
-      // TODO: 下一步，我們要將 videoId、category、trickName 等資料寫入 Supabase 資料庫！
+      // ==========================================
+      // 新增：將資料寫入 Supabase 'tricks' 資料表
+      // ==========================================
       
-      // 清空表單
-      // clearFile();
-      // setTrickName('');
-      // setTitle('');
-      // setDescription('');
+      // 取得目前登入使用者的 Supabase ID
+      const userId = session?.user?.id;
+      
+      if (!userId) {
+        throw new Error('無法取得使用者 ID，無法儲存至資料庫。');
+      }
+
+      const { error: dbError } = await supabase
+        .from('tricks')
+        .insert([
+          {
+            user_id: userId,
+            video_id: videoId,
+            category: category,
+            name: trickName,
+            privacy: privacy,
+            title: title || null, // 若為空則存 null
+            description: description || null, // 若為空則存 null
+          }
+        ]);
+
+      if (dbError) {
+        console.error('Supabase 寫入失敗:', dbError);
+        throw new Error('影片已上傳至 YouTube，但寫入資料庫失敗。');
+      }
+
+      // 成功後的處理
+      alert(`🎉 招式收錄成功！\nYouTube ID: ${videoId}`);
+      
+      // 清空表單，讓使用者可以繼續上傳下一個
+      clearFile();
+      setTrickName('');
+      setTitle('');
+      setDescription('');
+      
+      // ==========================================
 
     } catch (error: any) {
       console.error(error);
