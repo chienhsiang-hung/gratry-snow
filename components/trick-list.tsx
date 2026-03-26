@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Lock, Globe, Play, Loader2, Calendar } from 'lucide-react'
+import { Lock, Globe, Play, Loader2, Calendar, X } from 'lucide-react'
 import { TrickPlayer } from './trick-player'
 
 type Trick = {
@@ -70,30 +70,32 @@ export function TrickList() {
 function TrickCard({ trick }: { trick: Trick }) {
   const [isPlaying, setIsPlaying] = useState(false)
 
+  // 當開啟劇院模式時，禁止背景滾動 (優化手機體驗)
+  useEffect(() => {
+    if (isPlaying) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; }
+  }, [isPlaying]);
+
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
-      {isPlaying ? (
-        // 播放狀態：讓 TrickPlayer 自由展開，不限制高度
-        <div className="w-full bg-muted/20 p-3">
-          <TrickPlayer videoId={trick.video_id} />
-        </div>
-      ) : (
-        // 未播放狀態：嚴格套用 16:9 (aspect-video) 顯示精美縮圖
+    <>
+      {/* 這是原本的卡片 (永遠只顯示縮圖與資訊) */}
+      <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
-            {/* 縮圖 */}
             <img 
               src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
               alt={trick.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            {/* 播放按鈕遮罩 */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/30">
               <div className="rounded-full bg-background/90 p-4 text-foreground shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110">
                 <Play className="h-6 w-6 ml-1" />
               </div>
             </div>
-            {/* 右上角隱私標籤 */}
             <div className="absolute right-3 top-3 rounded-md bg-background/90 px-2.5 py-1 text-xs font-medium backdrop-blur-md">
               {trick.privacy === 'private' ? (
                 <span className="flex items-center gap-1.5 text-muted-foreground"><Lock className="h-3.5 w-3.5" /> 私人</span>
@@ -103,26 +105,47 @@ function TrickCard({ trick }: { trick: Trick }) {
             </div>
           </div>
         </div>
-      )}
 
-      {/* 資訊區塊保持不變 */}
-      <div className="flex flex-1 flex-col p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
-            {trick.category}
-          </span>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5" />
-            {new Date(trick.created_at).toLocaleDateString()}
-          </span>
+        <div className="flex flex-1 flex-col p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              {trick.category}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Calendar className="h-3.5 w-3.5" />
+              {new Date(trick.created_at).toLocaleDateString()}
+            </span>
+          </div>
+          <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
+          {trick.description && (
+            <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+              {trick.description}
+            </p>
+          )}
         </div>
-        <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
-        {trick.description && (
-          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-            {trick.description}
-          </p>
-        )}
       </div>
-    </div>
+
+      {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
+      {isPlaying && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24">
+          
+          {/* 右上角關閉按鈕 */}
+          <button 
+            onClick={() => setIsPlaying(false)}
+            className="absolute right-4 top-4 z-50 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25 sm:right-8 sm:top-8"
+          >
+            <X className="h-6 w-6 sm:h-8 sm:w-8" />
+          </button>
+
+          {/* 放大版的播放器容器 */}
+          <div className="w-full max-w-5xl animate-in fade-in zoom-in-95 duration-200">
+            {/* 招式名稱顯示在播放器上方，方便知道在看什麼 */}
+            <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">{trick.name}</h2>
+            <TrickPlayer videoId={trick.video_id} />
+          </div>
+          
+        </div>
+      )}
+    </>
   )
 }
