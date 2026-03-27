@@ -6,6 +6,13 @@ import { Lock, Globe, Play, Loader2, Calendar, X, Edit } from 'lucide-react'
 import { TrickPlayer } from './trick-player'
 import { useTranslations } from "next-intl"
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Trick = {
   id: string
@@ -45,6 +52,14 @@ export function TrickList() {
     }
 
     fetchTricks()
+
+    // 2. 監聽登入/登出事件，一有變動就重新抓取資料更新畫面
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null)
+      fetchTricks() 
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const handleTrickUpdated = (updatedTrick: Trick) => {
@@ -247,12 +262,23 @@ function TrickCard({
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium">{t('category')}</label>
-                <input 
-                  type="text"
-                  value={editForm.category}
-                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
+                <Select
+                  value={editForm.category} 
+                  onValueChange={(val) => setEditForm({...editForm, category: val})}
+                >
+                  <SelectTrigger className="w-full h-10">
+                    <SelectValue placeholder={t('select_category')} />
+                  </SelectTrigger>
+                  <SelectContent className="z-[70]">
+                    <SelectItem value="Riding">Riding</SelectItem>
+                    <SelectItem value="Carving">Carving</SelectItem>
+                    <SelectItem value="Style">Style</SelectItem>
+                    <SelectItem value="GroundTrick">GroundTrick</SelectItem>
+                    <SelectItem value="Jump">Jump</SelectItem>
+                    <SelectItem value="Lock">Lock</SelectItem>
+                    <SelectItem value="Flip">Flip</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
