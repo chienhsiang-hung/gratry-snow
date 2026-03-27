@@ -78,9 +78,13 @@ export function TrickList() {
 
   if (tricks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/30 py-32 text-center">
+      // 加入 px-6 並確保寬度 100%
+      <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/30 py-32 px-6 text-center">
         <p className="text-lg font-medium text-muted-foreground">{t('no_tricks')}</p>
-        <p className="text-sm text-muted-foreground/70">{t('be_first')}</p>
+        {/* 限制文字最大寬度，避免在窄螢幕上看起來太擠 */}
+        <p className="mt-2 max-w-[300px] text-sm text-muted-foreground/70 sm:max-w-none">
+          {t('be_first')}
+        </p>
       </div>
     )
   }

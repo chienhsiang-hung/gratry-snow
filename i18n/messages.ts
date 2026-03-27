@@ -121,7 +121,9 @@ const translations = {
   regular_stance: { en: 'Regular', zh: 'Regular 視角' },
   goofy_stance: { en: 'Goofy', zh: 'Goofy 視角' },
   edit_note: { en: 'Edit Note', zh: '編輯筆記' },
-  save: { en: 'Save', zh: '儲存' }
+  save: { en: 'Save', zh: '儲存' },
+  require_login: { en: 'Please Log In', zh: '請先登入' },
+  require_login_desc: { en: 'You need to log in to upload tricks.', zh: '您需要登入帳號才能上傳動作' },
 };
 
 export type Locale = 'en' | 'zh';
