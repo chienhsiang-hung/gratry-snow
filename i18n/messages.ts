@@ -3,6 +3,10 @@ const translations = {
     en: 'My exclusive snowboard ground tricks notes and video library', 
     zh: '我的專屬滑雪平花筆記與影片庫' 
   },
+  home: {
+    en: 'Home',
+    zh: '首頁'
+  },
   upload_trick: {
     en: 'Upload Trick',
     zh: '上傳動作'
