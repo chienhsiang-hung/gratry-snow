@@ -241,7 +241,7 @@ function TrickCard({
       {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
       {isPlaying && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-start bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
           onClick={() => setIsPlaying(false)}
         >
           
