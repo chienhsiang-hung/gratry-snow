@@ -38,6 +38,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale });
 
   return {
+    metadataBase: new URL('https://chienhsiang-hung.github.io/'),
     title: {
       template: "%s | Gratry Snow",
       default: t('metadata_title'),
