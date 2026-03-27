@@ -3,8 +3,10 @@
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing'; // 引入你的 i18n router
+import { toast } from 'sonner'; // 引入 sonner toast
 import {
   Select,
   SelectContent,
@@ -17,6 +19,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 export function UploadTrickForm() {
   const t = useTranslations();
+  
   const [privacy, setPrivacy] = useState<'private' | 'public'>('private');
   const [category, setCategory] = useState('');
   const [trickName, setTrickName] = useState('');
@@ -24,18 +27,26 @@ export function UploadTrickForm() {
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
-  // 狀態管理：增加「影片處理中」的狀態
+  // 狀態管理：增加進度與成功狀態
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef(new FFmpeg());
-  // 載入 FFmpeg (因為 GitHub Pages 無法設定 SharedArrayBuffer 的 Header，所以我們使用單執行緒版本)
+
+  // 載入 FFmpeg
   const loadFFmpeg = async () => {
     const ffmpeg = ffmpegRef.current;
     if (ffmpeg.loaded) return;
     
+    // 綁定進度監聽事件
+    ffmpeg.on('progress', ({ progress }) => {
+      setProgress(Math.round(progress * 100));
+    });
+
     const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
     await ffmpeg.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
@@ -51,14 +62,11 @@ export function UploadTrickForm() {
     const inputName = 'input.mp4';
     const outputName = 'output.mp4';
 
-    // 將使用者上傳的檔案寫入 FFmpeg 的虛擬檔案系統
     await ffmpeg.writeFile(inputName, await fetchFile(inputFile));
 
-    // 核心指令：-c:v copy (複製影像不重壓) / -an (移除聲音)
-    // 這個指令執行速度極快！
+    // 執行靜音
     await ffmpeg.exec(['-i', inputName, '-c:v', 'copy', '-an', outputName]);
 
-    // 從虛擬檔案系統讀取處理好的檔案
     const data = await ffmpeg.readFile(outputName);
     
     const fileData = data as Uint8Array;
@@ -69,13 +77,14 @@ export function UploadTrickForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !category || !trickName) {
-      alert('請填寫必填欄位並選擇影片！');
+      toast.error(t('error_missing_fields'));
       return;
     }
 
     try {
       // --- 步驟 A：前端靜音處理 ---
       setIsProcessing(true);
+      setProgress(0);
       const mutedFile = await processVideoToMute(file);
       setIsProcessing(false);
 
@@ -85,7 +94,7 @@ export function UploadTrickForm() {
       const providerToken = session?.provider_token;
 
       if (!providerToken) {
-        alert('無法取得 Google 授權 Token。請嘗試登出並重新登入，確保有同意 YouTube 權限！');
+        toast.error(t('error_no_token'));
         return;
       }
 
@@ -103,8 +112,6 @@ export function UploadTrickForm() {
 
       const formData = new FormData();
       formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      
-      // 注意：這裡改為上傳 mutedFile (靜音後的檔案)
       formData.append('file', mutedFile);
 
       const response = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status', {
@@ -141,18 +148,17 @@ export function UploadTrickForm() {
 
       if (dbError) throw new Error('寫入資料庫失敗');
 
-      alert(`🎉 影片上傳且靜音成功！\nYouTube ID: ${videoId}`);
-      clearFile();
-      setTrickName('');
-      setTitle('');
-      setDescription('');
+      // 觸發成功畫面與 Toast
+      toast.success(t('upload_success'));
+      setIsSuccess(true);
 
     } catch (error: any) {
       console.error(error);
-      alert(`發生錯誤: ${error.message}`);
+      toast.error(`發生錯誤: ${error.message}`);
     } finally {
       setIsProcessing(false);
       setIsUploading(false);
+      setProgress(0);
     }
   };
 
@@ -161,8 +167,51 @@ export function UploadTrickForm() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const handleResetForm = () => {
+    clearFile();
+    setTrickName('');
+    setTitle('');
+    setDescription('');
+    setIsSuccess(false); 
+  };
+
+  // ==========================================
+  // 畫面 A：成功狀態 UI
+  // ==========================================
+  if (isSuccess) {
+    return (
+      <div className="w-full max-w-2xl space-y-6 rounded-xl border bg-card p-8 shadow-sm text-center animate-in zoom-in-95 duration-300">
+        <div className="flex justify-center">
+          <CheckCircle2 className="h-16 w-16 text-green-500" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold tracking-tight">{t("upload_success")}</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+            {t("youtube_processing_desc")}
+          </p>
+        </div>
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/">
+              {t("back_to_home")}
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={handleResetForm} className="w-full sm:w-auto">
+            {t("upload_another")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // 畫面 B：上傳表單 UI
+  // ==========================================
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-8 rounded-xl border bg-card p-6 shadow-sm sm:p-8">
+    <form 
+      onSubmit={handleSubmit} 
+      className={`w-full max-w-2xl space-y-8 rounded-xl border bg-card p-6 shadow-sm sm:p-8 relative transition-opacity duration-300 ${isProcessing || isUploading ? 'opacity-70 pointer-events-none' : ''}`}
+    >
       <div className="space-y-2 text-center">
         <h2 className="text-2xl font-bold tracking-tight">{t("upload_title")}</h2>
         <p className="text-sm text-muted-foreground">{t("upload_subtitle")}</p>
@@ -294,14 +343,31 @@ export function UploadTrickForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-base" size="lg" disabled={isProcessing || isUploading}>
+      <Button type="submit" className="w-full text-base relative overflow-hidden" size="lg" disabled={isProcessing || isUploading}>
+        {/* 背景進度條特效 */}
         {isProcessing && (
-          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('processing_video') || '影片靜音處理中...'}</>
+          <div 
+            className="absolute left-0 top-0 h-full bg-black/10 dark:bg-white/10 transition-all duration-300" 
+            style={{ width: `${progress}%` }} 
+          />
         )}
-        {!isProcessing && isUploading && (
-          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('uploading') || '上傳至 YouTube...'}</>
-        )}
-        {!isProcessing && !isUploading && (t('submit_upload') || '確認上傳')}
+        
+        {/* 按鈕文字與圖示 */}
+        <span className="relative flex items-center justify-center">
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+              {t('processing_progress', { progress })}
+            </>
+          ) : isUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+              {t('uploading_to_youtube')}
+            </>
+          ) : (
+            t('submit_upload')
+          )}
+        </span>
       </Button>
     </form>
   );

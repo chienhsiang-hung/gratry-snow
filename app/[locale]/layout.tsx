@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import Navbar from "@/components/navbar";
+import { Toaster } from "@/components/ui/sonner"
 
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
@@ -62,6 +63,7 @@ return (
               </main>
             </div>
           </NextIntlClientProvider>
+          <Toaster position="top-center" />
         </ThemeProvider>
       </body>
     </html>

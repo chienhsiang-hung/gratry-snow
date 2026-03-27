@@ -60,7 +60,38 @@ const translations = {
   submit_upload: { en: 'Confirm & Upload', zh: '確認並上傳' },
   private: { en: 'Private', zh: '私人' },
   public: { en: 'Public', zh: '公開' },
-
+  upload_success: { 
+    en: '🎉 Trick uploaded successfully!', 
+    zh: '🎉 招式收錄成功！' 
+  },
+  youtube_processing_desc: { 
+    en: 'Video submitted. YouTube is processing the high-quality version, it may take a few minutes to be playable on the site.', 
+    zh: '影片已送出。YouTube 目前正在處理影片畫質，可能需要幾分鐘後才能在網站上正常播放。' 
+  },
+  back_to_home: { 
+    en: 'Back to Home', 
+    zh: '回首頁' 
+  },
+  upload_another: { 
+    en: 'Upload Another', 
+    zh: '繼續上傳下一個' 
+  },
+  error_missing_fields: { 
+    en: 'Please fill in required fields and select a video!', 
+    zh: '請填寫必填欄位並選擇影片！' 
+  },
+  error_no_token: { 
+    en: 'Cannot get Google authorization, please log in again.', 
+    zh: '無法取得授權，請重新登入。' 
+  },
+  uploading_to_youtube: { 
+    en: 'Uploading to YouTube...', 
+    zh: '上傳至 YouTube 中...' 
+  },
+  processing_progress: { 
+    en: 'Muting video {progress}%', 
+    zh: '影片靜音處理中 {progress}%' 
+  },
   // === 以下為 TrickList 新增的翻譯 ===
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
