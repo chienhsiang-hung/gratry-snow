@@ -6,6 +6,10 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+export const metadata = {
+  title: "Privacy Policy", 
+};
+
 export default async function PrivacyPolicyPage({ 
   params 
 }: { 
