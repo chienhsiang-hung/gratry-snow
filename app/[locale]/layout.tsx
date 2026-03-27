@@ -56,7 +56,7 @@ export async function generateMetadata({
       siteName: "Gratry Snow",
       images: [
         {
-          url: '/gratry-snow/og-image.png', 
+          url: '/gratry-snow/og-image.svg', 
           width: 1200,
           height: 630,
           alt: "Gratry Snow Preview",
@@ -67,7 +67,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: t('metadata_title'),
       description: t('metadata_desc'),
-      images: ['/gratry-snow/og-image.png'],
+      images: ['/gratry-snow/og-image.svg'],
     },
   };
 }
