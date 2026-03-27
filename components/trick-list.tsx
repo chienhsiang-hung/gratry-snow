@@ -240,7 +240,10 @@ function TrickCard({
 
       {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
       {isPlaying && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12">
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
+          onClick={() => setIsPlaying(false)}
+        >
           
           {/* 右上角關閉按鈕 */}
           <button 
@@ -251,10 +254,13 @@ function TrickCard({
           </button>
 
           {/* 放大版的播放器容器 */}
-          <div className="w-full max-w-5xl animate-in fade-in zoom-in-95 duration-200">
-            {/* 招式名稱顯示在播放器上方，方便知道在看什麼 */}
+          <div
+            className="w-full max-w-5xl animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">{trick.name}</h2>
             <TrickPlayer videoId={trick.video_id} />
+
             <div className="mt-6 w-full">
               {isEditingNote ? (
                 <div className="rounded-lg bg-white/10 p-4 border border-white/20 shadow-lg flex flex-col gap-3">
@@ -295,7 +301,7 @@ function TrickCard({
                     {isOwner && (
                       <button 
                         onClick={() => { setTempNote(trick.description || ''); setIsEditingNote(true); }}
-                        className="absolute right-3 top-3 rounded p-1.5 text-white/40 opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100"
+                        className="absolute right-3 top-3 rounded p-1.5 text-white/60 md:opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100"
                         title={t('edit_note')}
                       >
                         <Edit className="h-4 w-4" />
