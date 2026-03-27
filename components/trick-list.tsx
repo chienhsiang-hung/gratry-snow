@@ -283,14 +283,18 @@ function TrickCard({
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium">{t('privacy_setting')}</label>
-                <select
+                <Select
                   value={editForm.privacy}
-                  onChange={(e) => setEditForm({...editForm, privacy: e.target.value as 'public' | 'private'})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onValueChange={(val) => setEditForm({...editForm, privacy: val as 'public' | 'private'})}
                 >
-                  <option value="public">{t('public_visibility')}</option>
-                  <option value="private">{t('private_visibility')}</option>
-                </select>
+                  <SelectTrigger className="w-full h-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="z-[70]"> {/* 加上 z-[70] 避免被 Modal 擋住 */}
+                    <SelectItem value="public">{t('public_visibility')}</SelectItem>
+                    <SelectItem value="private">{t('private_visibility')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
