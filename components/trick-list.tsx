@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Lock, Globe, Play, Loader2, Calendar, X } from 'lucide-react'
 import { TrickPlayer } from './trick-player'
+import { useTranslations } from "next-intl"
 
 type Trick = {
   id: string
@@ -69,6 +70,7 @@ export function TrickList() {
 
 function TrickCard({ trick }: { trick: Trick }) {
   const [isPlaying, setIsPlaying] = useState(false)
+  const t = useTranslations();
 
   // 當開啟劇院模式時，禁止背景滾動 (優化手機體驗)
   useEffect(() => {
@@ -98,9 +100,9 @@ function TrickCard({ trick }: { trick: Trick }) {
             </div>
             <div className="absolute right-3 top-3 rounded-md bg-background/90 px-2.5 py-1 text-xs font-medium backdrop-blur-md">
               {trick.privacy === 'private' ? (
-                <span className="flex items-center gap-1.5 text-muted-foreground"><Lock className="h-3.5 w-3.5" /> 私人</span>
+                <span className="flex items-center gap-1.5 text-muted-foreground"><Lock className="h-3.5 w-3.5" /> {t('private')}</span>
               ) : (
-                <span className="flex items-center gap-1.5 text-primary"><Globe className="h-3.5 w-3.5" /> 公開</span>
+                <span className="flex items-center gap-1.5 text-primary"><Globe className="h-3.5 w-3.5" /> {t('public')}</span>
               )}
             </div>
           </div>

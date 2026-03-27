@@ -52,7 +52,9 @@ const translations = {
   video_title: { en: 'Video Title', zh: '影片標題 (若留空將預設為招式名稱)' },
   video_desc: { en: 'Description...', zh: '在此記錄發力點、重心位置，這段文字也會同步為 YouTube 影片說明...' },
   uploading: { en: 'Uploading to YouTube...', zh: '正在上傳至 YouTube...' },
-  submit_upload: { en: 'Confirm & Upload', zh: '確認並上傳' }
+  submit_upload: { en: 'Confirm & Upload', zh: '確認並上傳' },
+  private: { en: 'Private', zh: '私人' },
+  public: { en: 'Public', zh: '公開' },
 };
 
 export type Locale = 'en' | 'zh';
