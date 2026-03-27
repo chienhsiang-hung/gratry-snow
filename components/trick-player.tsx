@@ -4,12 +4,14 @@ import { useState } from 'react';
 import YouTube, { YouTubeEvent, YouTubePlayer } from 'react-youtube';
 import { Button } from '@/components/ui/button';
 import { FlipHorizontal, VolumeX, Volume2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function TrickPlayer({ videoId }: { videoId: string }) {
+  const t = useTranslations();
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMirrored, setIsMirrored] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // 預設可以設為 true 避免被版權音樂嚇到
+  const [isMuted, setIsMuted] = useState(true); // 預設可以設為 true 避免被版權音樂嚇到
 
   const onReady = (event: YouTubeEvent) => {
     const ytPlayer = event.target;
@@ -69,7 +71,7 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
         
         {/* 左側：多段速控制 */}
         <div className="flex items-center gap-2">
-          <span className="mr-1 text-sm font-semibold text-muted-foreground">速度</span>
+          <span className="mr-1 text-sm font-semibold text-muted-foreground">{t('speed')}</span>
           {[0.25, 0.5, 0.75, 1].map((rate) => (
             <Button
               key={rate}
@@ -90,7 +92,7 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
             size="sm"
             onClick={toggleMute}
             className="h-8 w-8 p-0 text-muted-foreground"
-            title={isMuted ? "取消靜音" : "靜音"}
+            title={isMuted ? t('unmute') : t('mute')}
           >
             {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
@@ -103,7 +105,7 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
           >
             <FlipHorizontal className="h-4 w-4" />
             <span className="hidden sm:inline">
-              {isMirrored ? 'Regular 視角' : 'Goofy 視角'}
+              {isMirrored ? t('regular_stance') : t('goofy_stance')}
             </span>
           </Button>
         </div>

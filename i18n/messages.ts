@@ -70,7 +70,14 @@ const translations = {
   cancel: { en: 'Cancel', zh: '取消' },
   saving: { en: 'Saving...', zh: '儲存中...' },
   save_changes: { en: 'Save Changes', zh: '儲存修改' },
-  update_failed: { en: 'Failed to update. Please try again later.', zh: '更新失敗，請稍後再試' }
+  update_failed: { en: 'Failed to update. Please try again later.', zh: '更新失敗，請稍後再試' },
+  speed: { en: 'Speed', zh: '速度' },
+  unmute: { en: 'Unmute', zh: '取消靜音' },
+  mute: { en: 'Mute', zh: '靜音' },
+  regular_stance: { en: 'Regular', zh: 'Regular 視角' },
+  goofy_stance: { en: 'Goofy', zh: 'Goofy 視角' },
+  edit_note: { en: 'Edit Note', zh: '編輯筆記' },
+  save: { en: 'Save', zh: '儲存' }
 };
 
 export type Locale = 'en' | 'zh';

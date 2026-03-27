@@ -108,6 +108,12 @@ function TrickCard({
   const [isPlaying, setIsPlaying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
+  // ▼▼▼ 新增：專門給劇院模式快速編輯筆記用的 State ▼▼▼
+  const [isEditingNote, setIsEditingNote] = useState(false)
+  const [tempNote, setTempNote] = useState(trick.description || '')
+  const [isSavingNote, setIsSavingNote] = useState(false)
+
   const [editForm, setEditForm] = useState({
     name: trick.name,
     category: trick.category,
@@ -143,6 +149,28 @@ function TrickCard({
     setIsSaving(false)
   }
 
+  // ▼▼▼ 新增：專門儲存劇院模式筆記的 Function ▼▼▼
+  const handleSaveNote = async () => {
+    setIsSavingNote(true)
+    const { data, error } = await supabase
+      .from('tricks')
+      .update({ description: tempNote })
+      .eq('id', trick.id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('更新筆記失敗:', error)
+      alert(t('update_failed'))
+    } else if (data) {
+      onUpdate(data) 
+      setIsEditingNote(false)
+      // 同步更新主表單的內容，確保兩邊資料一致
+      setEditForm(prev => ({ ...prev, description: tempNote }))
+    }
+    setIsSavingNote(false)
+  }
+  
   // 當開啟劇院模式時，禁止背景滾動 (優化手機體驗)
   useEffect(() => {
     if (isPlaying || isEditing) {
@@ -227,13 +255,67 @@ function TrickCard({
             {/* 招式名稱顯示在播放器上方，方便知道在看什麼 */}
             <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">{trick.name}</h2>
             <TrickPlayer videoId={trick.video_id} />
-            {trick.description && (
-              <div className="mt-6 rounded-lg bg-white/5 p-4 border border-white/10 shadow-lg">
-                <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed">
-                  {trick.description}
-                </p>
-              </div>
-            )}
+            <div className="mt-6 w-full">
+              {isEditingNote ? (
+                <div className="rounded-lg bg-white/10 p-4 border border-white/20 shadow-lg flex flex-col gap-3">
+                  <textarea
+                    className="w-full bg-black/40 text-white rounded-md p-3 text-sm focus:outline-none focus:ring-1 focus:ring-white/50 resize-none placeholder:text-white/40"
+                    rows={5}
+                    value={tempNote}
+                    onChange={(e) => setTempNote(e.target.value)}
+                    placeholder={t('notes_placeholder')}
+                    autoFocus
+                  />
+                  <div className="flex justify-end gap-2 mt-2">
+                    <Button 
+                      variant="ghost" 
+                      className="text-white hover:bg-white/20 hover:text-white" 
+                      size="sm"
+                      onClick={() => { setIsEditingNote(false); setTempNote(trick.description || ''); }} 
+                      disabled={isSavingNote}
+                    >
+                      {t('cancel')}
+                    </Button>
+                    <Button
+                      size="sm" 
+                      className="bg-primary text-primary-foreground hover:bg-primary/90" 
+                      onClick={handleSaveNote} 
+                      disabled={isSavingNote}
+                    >
+                      {isSavingNote ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      {t('save')}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // 只有擁有者，或是本身已經有筆記時，才顯示這個區塊
+                (trick.description || isOwner) && (
+                  <div className="group relative rounded-lg bg-white/5 p-4 border border-white/10 shadow-lg transition-colors hover:bg-white/10">
+                    {/* 如果是擁有者，右上角顯示隱藏的編輯按鈕 (Hover 時出現) */}
+                    {isOwner && (
+                      <button 
+                        onClick={() => { setTempNote(trick.description || ''); setIsEditingNote(true); }}
+                        className="absolute right-3 top-3 rounded p-1.5 text-white/40 opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100"
+                        title={t('edit_note')}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
+
+                    {trick.description ? (
+                      <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed pr-8">
+                        {trick.description}
+                      </p>
+                    ) : (
+                      // 如果沒有筆記，提示擁有者點擊新增
+                      <p className="text-sm italic text-white/40 cursor-pointer" onClick={() => setIsEditingNote(true)}>
+                        {t('notes_placeholder')} ({t('edit_note')})
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       )}
