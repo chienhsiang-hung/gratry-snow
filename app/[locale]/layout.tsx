@@ -45,8 +45,8 @@ export async function generateMetadata({
     description: t('metadata_desc'),
     keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding", "平花", "滑雪", "單板"],
     icons: {
-      icon: '/gratry-snow/logo.svg',
-      apple: '/gratry-snow/logo.svg',
+      icon: '/gratry-snow/favicon.ico',
+      apple: '/gratry-snow/apple-touch-icon.png',
     },
     openGraph: {
       title: t('metadata_title'),
@@ -55,7 +55,7 @@ export async function generateMetadata({
       siteName: "Gratry Snow",
       images: [
         {
-          url: '/gratry-snow/og-image.svg', 
+          url: '/gratry-snow/og-image.png', 
           width: 1200,
           height: 630,
           alt: "Gratry Snow Preview",
@@ -66,7 +66,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: t('metadata_title'),
       description: t('metadata_desc'),
-      images: ['/gratry-snow/og-image.svg'],
+      images: ['/gratry-snow/og-image.png'],
     },
   };
 }
