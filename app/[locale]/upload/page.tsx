@@ -12,8 +12,7 @@ export default async function UploadPage({
   setRequestLocale(locale);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-4 pt-12 sm:p-12 md:p-24">
-      {/* 使用 AuthGuard 保護這區塊 */}
+    <main className="flex flex-1 flex-col items-center p-4 pt-12 sm:p-12 md:p-24">
       <AuthGuard>
         <UploadTrickForm />
       </AuthGuard>
