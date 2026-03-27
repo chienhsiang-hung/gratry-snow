@@ -241,13 +241,16 @@ function TrickCard({
       {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
       {isPlaying && (
         <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-start bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
+          className="dark fixed inset-0 z-50 flex flex-col items-center justify-start bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
           onClick={() => setIsPlaying(false)}
         >
           
           {/* 右上角關閉按鈕 */}
           <button 
-            onClick={() => setIsPlaying(false)}
+            onClick={() => {
+              setIsPlaying(false);
+              setIsEditingNote(false); // 關閉筆記編輯（如果開著的話）
+            }}
             className="fixed right-4 top-4 z-50 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25 sm:right-8 sm:top-8"
           >
             <X className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -314,7 +317,7 @@ function TrickCard({
                       </p>
                     ) : (
                       // 如果沒有筆記，提示擁有者點擊新增
-                      <p className="text-sm italic text-white/40 cursor-pointer" onClick={() => setIsEditingNote(true)}>
+                      <p className="text-sm italic text-white/40 cursor-pointer pr-8" onClick={() => setIsEditingNote(true)}>
                         {t('notes_placeholder')} ({t('edit_note')})
                       </p>
                     )}

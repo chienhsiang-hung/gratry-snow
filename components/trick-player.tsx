@@ -13,8 +13,8 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   const [isMirrored, setIsMirrored] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  // 🚀 新增：自訂播放器狀態
-  const [isPlayingVideo, setIsPlayingVideo] = useState(true); // 預設 autoplay: 1
+  // 💡 預設改為 false，等 YouTube 真正開始播放時再變 true，避免被瀏覽器阻擋自動播放時狀態不同步
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false); // 判斷使用者是否正在拖拉進度條
@@ -27,17 +27,15 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
     setDuration(ytPlayer.getDuration()); // 取得影片總長度
   };
 
-  const onStateChange = (event: YouTubeEvent) => {
-    // YouTube.PlayerState 的狀態碼：PLAYING = 1, PAUSED = 2, ENDED = 0
-    if (event.data === 1) {
-      setIsPlayingVideo(true);
-      setDuration(event.target.getDuration()); // 確保抓到正確長度
-    } else if (event.data === 2 || event.data === 0) {
-      setIsPlayingVideo(false);
-    }
+  // 💡 直接吃 YouTube 官方的事件，確保按鈕狀態 100% 同步
+  const handlePlay = (event: YouTubeEvent) => {
+    setIsPlayingVideo(true);
+    setDuration(event.target.getDuration() || 0);
   };
+  const handlePause = () => setIsPlayingVideo(false);
+  const handleEnd = () => setIsPlayingVideo(false);
 
-  // 🚀 每 100 毫秒同步一次播放進度 (效能極佳，不會 lag)
+  // 進度條同步
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (player && isPlayingVideo && !isDragging) {
@@ -60,7 +58,6 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
     }
   };
 
-  // 拖拉進度條的邏輯
   const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value);
     setCurrentTime(time); // 讓畫面即時跟著拖拉的數值變動
@@ -69,7 +66,6 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
     }
   };
 
-  // 實用工具：格式化秒數為 mm:ss (例如 65 秒 -> 1:05)
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return '0:00';
     const m = Math.floor(seconds / 60);
@@ -115,6 +111,9 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
             }
           }}
           onReady={onReady}
+          onPlay={handlePlay}     // ✨ 綁定官方事件
+          onPause={handlePause}   // ✨ 綁定官方事件
+          onEnd={handleEnd}       // ✨ 綁定官方事件
           className="absolute inset-0 h-full w-full pointer-events-none"
           iframeClassName="h-full w-full border-0"
         />
@@ -168,7 +167,13 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
                   variant={playbackRate === rate ? "default" : "outline"}
                   size="sm"
                   onClick={() => changeSpeed(rate)}
-                  className="h-8 px-2.5 text-xs font-medium transition-all"
+                  // 💡 修改這裡：特別針對劇院模式的深色背景，強制設定未選中狀態的配色
+                  className={`h-8 px-2.5 text-xs font-medium transition-all ${
+                    playbackRate !== rate
+                      // 未選中狀態：強制白色文字、淡色邊框、Hover 時更亮
+                      ? 'text-white/90 border-white/20 hover:bg-white/10 hover:text-white' 
+                      : '' // 選中狀態保持原本的 variant="default" 配色
+                  }`}
                 >
                  {rate}x
                 </Button>
