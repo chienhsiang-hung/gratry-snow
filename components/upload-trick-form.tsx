@@ -3,16 +3,26 @@
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Lock, Globe, X } from 'lucide-react';
+import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function UploadTrickForm() {
+  const t = useTranslations();
   const [privacy, setPrivacy] = useState<'private' | 'public'>('private');
   const [category, setCategory] = useState('');
   const [trickName, setTrickName] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false)
+  const [showOptional, setShowOptional] = useState(false);;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -132,8 +142,8 @@ export function UploadTrickForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-8 rounded-xl border bg-card p-6 shadow-sm sm:p-8">
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">上傳招式影片</h2>
-        <p className="text-sm text-muted-foreground">將影片直接上傳至你的 YouTube 頻道，並收錄到 Gratry Snow 招式庫中。</p>
+        <h2 className="text-2xl font-bold tracking-tight">{t("upload_title")}</h2>
+        <p className="text-sm text-muted-foreground">{t("upload_subtitle")}</p>
       </div>
 
       <div className="space-y-6">
@@ -143,8 +153,8 @@ export function UploadTrickForm() {
             <label htmlFor="video-upload" className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:bg-muted">
               <div className="flex flex-col items-center justify-center pb-6 pt-5">
                 <UploadCloud className="mb-3 h-8 w-8 text-muted-foreground" />
-                <p className="mb-2 text-sm font-medium text-foreground">點擊選擇影片</p>
-                <p className="text-xs text-muted-foreground">支援 MP4, WebM 等常見格式</p>
+                <p className="mb-2 text-sm font-medium text-foreground">{t("click_to_upload")}</p>
+                <p className="text-xs text-muted-foreground">{t("support_formats")}</p>
               </div>
               <input 
                 id="video-upload" 
@@ -174,47 +184,46 @@ export function UploadTrickForm() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          {/* 必填：招式類別 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">招式類別 <span className="text-destructive">*</span></label>
-            <select 
-              value={category} 
-              onChange={(e) => setCategory(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              required
-            >
-              <option value="" disabled>選擇類別...</option>
-              <option value="classic">Classic (經典)</option>
-              <option value="style">Style (風格)</option>
-              <option value="jump">Jump (跳躍)</option>
-              <option value="lock">Lock (鎖定)</option>
-            </select>
+            <label className="text-sm font-medium">{t('category')} <span className="text-destructive">*</span></label>
+              <Select value={category} onValueChange={setCategory} required>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t('select_category')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Riding">Riding</SelectItem>
+                <SelectItem value="Carving">Carving</SelectItem>
+                <SelectItem value="Style">Style</SelectItem>
+                <SelectItem value="GroundTrick">GroundTrick</SelectItem>
+                <SelectItem value="Jump">Jump</SelectItem>
+                <SelectItem value="Lock">Lock</SelectItem>
+                <SelectItem value="Flip">Flip</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* 必填：招式名稱 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">招式名稱 <span className="text-destructive">*</span></label>
+            <label className="text-sm font-medium">{t('trick_name')} <span className="text-destructive">*</span></label>
             <input 
               type="text" 
               value={trickName}
               onChange={(e) => setTrickName(e.target.value)}
-              placeholder="例如: Nollie 360"
+              placeholder={t('trick_name_placeholder')}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               required
             />
           </div>
         </div>
 
-        {/* 隱私設定 */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">影片隱私設定 (收錄方式)</label>
+          <label className="text-sm font-medium">{t('privacy_settings')}</label>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${privacy === 'private' ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`}>
               <input type="radio" name="privacy" value="private" className="mt-1 sr-only" checked={privacy === 'private'} onChange={() => setPrivacy('private')} />
               <Lock className={`mt-0.5 h-5 w-5 shrink-0 ${privacy === 'private' ? 'text-primary' : 'text-muted-foreground'}`} />
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">私人筆記</p>
-                <p className="text-xs text-muted-foreground">收錄為私人用途，僅限自己觀看</p>
+                <p className="text-sm font-medium leading-none">{t('private_note')}</p>
+                <p className="text-xs text-muted-foreground">{t('private_desc')}</p>
               </div>
             </label>
             
@@ -222,38 +231,49 @@ export function UploadTrickForm() {
               <input type="radio" name="privacy" value="public" className="mt-1 sr-only" checked={privacy === 'public'} onChange={() => setPrivacy('public')} />
               <Globe className={`mt-0.5 h-5 w-5 shrink-0 ${privacy === 'public' ? 'text-primary' : 'text-muted-foreground'}`} />
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">公開分享</p>
-                <p className="text-xs text-muted-foreground">發佈至公共招式庫，可被評分與留言</p>
+                <p className="text-sm font-medium leading-none">{t('public_share')}</p>
+                <p className="text-xs text-muted-foreground">{t('public_desc')}</p>
               </div>
             </label>
           </div>
         </div>
 
-        {/* 選填：標題與描述 */}
-        <div className="space-y-4 rounded-lg bg-muted/30 p-4">
-          <p className="text-sm font-medium text-muted-foreground">YouTube 影片資訊 (選填)</p>
-          <div className="space-y-2">
-            <input 
-              type="text" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="影片標題 (若留空將預設為招式名稱)"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-          <div className="space-y-2">
-            <textarea 
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="在此記錄發力點、重心位置，這段文字也會同步為 YouTube 影片說明..."
-              className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
+        <div className="space-y-4 rounded-lg border bg-muted/10 p-4 transition-all">
+          <button
+            type="button" 
+            onClick={() => setShowOptional(!showOptional)}
+            className="flex w-full items-center justify-between text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            <span>{t('youtube_optional')}</span>
+            {showOptional ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+
+          {showOptional && (
+            <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
+              <div className="space-y-2">
+                <input
+                  type="text" 
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={t('video_title')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+              <div className="space-y-2">
+                <textarea 
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t('video_desc')}
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <Button type="submit" className="w-full text-base" size="lg" disabled={isUploading}>
-        {isUploading ? '正在上傳至 YouTube...' : '確認並上傳'}
+        {isUploading ? t('uploading') : t('submit_upload')}
       </Button>
     </form>
   );
