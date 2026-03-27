@@ -3,7 +3,7 @@
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   Select,
@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 export function UploadTrickForm() {
   const t = useTranslations();
@@ -21,9 +23,48 @@ export function UploadTrickForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false)
-  const [showOptional, setShowOptional] = useState(false);;
+
+  // 狀態管理：增加「影片處理中」的狀態
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showOptional, setShowOptional] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const ffmpegRef = useRef(new FFmpeg());
+  // 載入 FFmpeg (因為 GitHub Pages 無法設定 SharedArrayBuffer 的 Header，所以我們使用單執行緒版本)
+  const loadFFmpeg = async () => {
+    const ffmpeg = ffmpegRef.current;
+    if (ffmpeg.loaded) return;
+    
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+  };
+
+  // 執行靜音處理的函數
+  const processVideoToMute = async (inputFile: File): Promise<File> => {
+    const ffmpeg = ffmpegRef.current;
+    await loadFFmpeg();
+
+    const inputName = 'input.mp4';
+    const outputName = 'output.mp4';
+
+    // 將使用者上傳的檔案寫入 FFmpeg 的虛擬檔案系統
+    await ffmpeg.writeFile(inputName, await fetchFile(inputFile));
+
+    // 核心指令：-c:v copy (複製影像不重壓) / -an (移除聲音)
+    // 這個指令執行速度極快！
+    await ffmpeg.exec(['-i', inputName, '-c:v', 'copy', '-an', outputName]);
+
+    // 從虛擬檔案系統讀取處理好的檔案
+    const data = await ffmpeg.readFile(outputName);
+    
+    const fileData = data as Uint8Array;
+    const mutedBlob = new Blob([fileData.buffer as ArrayBuffer], { type: 'video/mp4' });
+    return new File([mutedBlob], `muted_${inputFile.name}`, { type: 'video/mp4' });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,40 +73,40 @@ export function UploadTrickForm() {
       return;
     }
 
-    setIsUploading(true);
-    
     try {
-      // 1. 取得當前 Session 中的 Google Provider Token
+      // --- 步驟 A：前端靜音處理 ---
+      setIsProcessing(true);
+      const mutedFile = await processVideoToMute(file);
+      setIsProcessing(false);
+
+      // --- 步驟 B：開始上傳至 YouTube ---
+      setIsUploading(true);
       const { data: { session } } = await supabase.auth.getSession();
       const providerToken = session?.provider_token;
 
       if (!providerToken) {
         alert('無法取得 Google 授權 Token。請嘗試登出並重新登入，確保有同意 YouTube 權限！');
-        setIsUploading(false);
         return;
       }
 
-      // 2. 準備 YouTube 影片的 Metadata (中繼資料)
       const metadata = {
         snippet: {
-          title: title || trickName, // 若沒填標題，預設用招式名稱
+          title: title || trickName,
           description: description || `招式: ${trickName}\n分類: ${category}\n\nUploaded via Gratry Snow`,
-          categoryId: '17', // 17 代表 YouTube 的 "Sports" (體育) 類別
+          categoryId: '17', 
         },
         status: {
-          // 私人筆記設為 private。
-          // 公開分享建議設為 unlisted (非公開)，這樣網站能正常播放，但不會把使用者的個人頻道洗版。
           privacyStatus: 'unlisted', 
-          embeddable: true, // 允許在你的網站上透過 iframe 嵌入播放
+          embeddable: true, 
         },
       };
 
-      // 3. 建立 Multipart FormData
       const formData = new FormData();
       formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      formData.append('file', file);
+      
+      // 注意：這裡改為上傳 mutedFile (靜音後的檔案)
+      formData.append('file', mutedFile);
 
-      // 4. 發送請求至 YouTube Data API
       const response = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status', {
         method: 'POST',
         headers: {
@@ -77,59 +118,40 @@ export function UploadTrickForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('YouTube API Error:', data);
         throw new Error(data.error?.message || '上傳失敗');
       }
 
       const videoId = data.id;
-      console.log('上傳成功！YouTube Video ID:', videoId);
-      alert(`🎉 影片上傳成功！YouTube ID: ${videoId}`);
-
-      // ==========================================
-      // 新增：將資料寫入 Supabase 'tricks' 資料表
-      // ==========================================
       
-      // 取得目前登入使用者的 Supabase ID
+      // --- 步驟 C：寫入 Supabase 資料庫 ---
       const userId = session?.user?.id;
-      
-      if (!userId) {
-        throw new Error('無法取得使用者 ID，無法儲存至資料庫。');
-      }
+      if (!userId) throw new Error('無法取得使用者 ID');
 
       const { error: dbError } = await supabase
         .from('tricks')
-        .insert([
-          {
+        .insert([{
             user_id: userId,
             video_id: videoId,
             category: category,
             name: trickName,
             privacy: privacy,
-            title: title || null, // 若為空則存 null
-            description: description || null, // 若為空則存 null
-          }
-        ]);
+            title: title || null,
+            description: description || null,
+        }]);
 
-      if (dbError) {
-        console.error('Supabase 寫入失敗:', dbError);
-        throw new Error('影片已上傳至 YouTube，但寫入資料庫失敗。');
-      }
+      if (dbError) throw new Error('寫入資料庫失敗');
 
-      // 成功後的處理
-      alert(`🎉 招式收錄成功！\nYouTube ID: ${videoId}`);
-      
-      // 清空表單，讓使用者可以繼續上傳下一個
+      alert(`🎉 影片上傳且靜音成功！\nYouTube ID: ${videoId}`);
       clearFile();
       setTrickName('');
       setTitle('');
       setDescription('');
-      
-      // ==========================================
 
     } catch (error: any) {
       console.error(error);
       alert(`發生錯誤: ${error.message}`);
     } finally {
+      setIsProcessing(false);
       setIsUploading(false);
     }
   };
@@ -272,8 +294,14 @@ export function UploadTrickForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-base" size="lg" disabled={isUploading}>
-        {isUploading ? t('uploading') : t('submit_upload')}
+      <Button type="submit" className="w-full text-base" size="lg" disabled={isProcessing || isUploading}>
+        {isProcessing && (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('processing_video') || '影片靜音處理中...'}</>
+        )}
+        {!isProcessing && isUploading && (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('uploading') || '上傳至 YouTube...'}</>
+        )}
+        {!isProcessing && !isUploading && (t('submit_upload') || '確認上傳')}
       </Button>
     </form>
   );
