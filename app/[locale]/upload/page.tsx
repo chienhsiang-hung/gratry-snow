@@ -1,17 +1,27 @@
-// 檔案位置：app/[locale]/upload/page.tsx
 import { UploadTrickForm } from "@/components/upload-trick-form";
 import { setRequestLocale } from "next-intl/server";
 import AuthGuard from "@/components/auth-guard";
 import { routing } from '@/i18n/routing';
+import type { Metadata } from "next";
+import { getTranslations } from 'next-intl/server';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const metadata = {
-  title: "Upload Trick", 
-};
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ locale: string }> 
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
+
+  return {
+    title: t('upload_trick'),
+  };
+}
 
 export default async function UploadPage({
   params

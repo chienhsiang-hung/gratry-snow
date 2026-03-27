@@ -9,6 +9,7 @@ import Navbar from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner"
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamicParams = false;
 
@@ -28,24 +29,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    template: "%s | Gratry Snow",
-    default: "Gratry Snow | Snowboard Ground Trick Library", 
-  },
-  description: "Your ultimate snowboard ground tricks library and notes. Upload, mute, and organize your Gratry practice videos.",
-  keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding", "平花", "滑雪", "單板"],
-  icons: {
-    icon: '/gratry-snow/logo.svg', 
-    apple: '/gratry-snow/logo.svg',
-  },
-  openGraph: {
-    title: "Gratry Snow | Snowboard Ground Trick Library",
-    description: "Your ultimate snowboard ground tricks library and notes.",
-    type: "website",
-    siteName: "Gratry Snow",
-  }
-};
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ locale: string }> 
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
+
+  return {
+    title: {
+      template: "%s | Gratry Snow",
+      default: t('metadata_title'), 
+    },
+    description: t('metadata_desc'),
+    keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding", "平花", "滑雪", "單板"],
+    icons: {
+      icon: '/gratry-snow/favicon.ico',
+      apple: '/gratry-snow/apple-touch-icon.png',
+    },
+    openGraph: {
+      title: t('metadata_title'),
+      description: t('metadata_desc'),
+      type: "website",
+      siteName: "Gratry Snow",
+    }
+  };
+}
 
 export default async function RootLayout({
   children,

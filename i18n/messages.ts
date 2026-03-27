@@ -1,4 +1,12 @@
 const translations = {
+  metadata_title: {
+    en: 'Gratry Snow | Snowboard Ground Trick Library',
+    zh: 'Gratry Snow | 平地花式滑雪招式與筆記庫'
+  },
+  metadata_desc: {
+    en: 'Your ultimate snowboard ground tricks library and notes. Upload, mute, and organize your Gratry practice videos.',
+    zh: '你的專屬滑雪平花影片與筆記庫。支援前端影片靜音、上傳並整理你的滑雪練習紀錄。'
+  },
   description: { 
     en: 'My exclusive snowboard ground tricks notes and video library', 
     zh: '我的專屬滑雪平花筆記與影片庫' 
