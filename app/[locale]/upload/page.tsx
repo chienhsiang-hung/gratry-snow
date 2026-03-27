@@ -9,6 +9,10 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+export const metadata = {
+  title: "Upload Trick", 
+};
+
 export default async function UploadPage({
   params
 }: {

@@ -29,8 +29,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gratry Snow",
-  description: "Your ultimate snowboard ground tricks library and notes.",
+  title: {
+    template: "%s | Gratry Snow",
+    default: "Gratry Snow | Snowboard Ground Trick Library", 
+  },
+  description: "Your ultimate snowboard ground tricks library and notes. Upload, mute, and organize your Gratry practice videos.",
+  keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding", "平花", "滑雪", "單板"],
+  icons: {
+    icon: '/gratry-snow/logo.svg', 
+    apple: '/gratry-snow/logo.svg',
+  },
+  openGraph: {
+    title: "Gratry Snow | Snowboard Ground Trick Library",
+    description: "Your ultimate snowboard ground tricks library and notes.",
+    type: "website",
+    siteName: "Gratry Snow",
+  }
 };
 
 export default async function RootLayout({
