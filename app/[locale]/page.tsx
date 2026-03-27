@@ -11,9 +11,9 @@ export default async function Home({
   const t = await getTranslations({ locale });
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center p-24">
+    <main className="flex flex-1 flex-col items-center w-full px-4 pt-16 pb-12 md:px-8 md:pt-24 gap-8">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">{t("title")}</h1>
+        <h1 className="text-4xl font-bold">Gratry Snow</h1>
         <p className="text-muted-foreground">{t("description")}</p>
       </div>
 
