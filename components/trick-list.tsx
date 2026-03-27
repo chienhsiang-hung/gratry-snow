@@ -22,6 +22,7 @@ export function TrickList() {
   const [tricks, setTricks] = useState<Trick[]>([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const t = useTranslations()
 
   useEffect(() => {
     async function fetchTricks() {
@@ -63,8 +64,8 @@ export function TrickList() {
   if (tricks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/30 py-32 text-center">
-        <p className="text-lg font-medium text-muted-foreground">目前還沒有收錄任何招式</p>
-        <p className="text-sm text-muted-foreground/70">趕快點擊右上角的新增招式，成為第一個上傳的人吧！</p>
+        <p className="text-lg font-medium text-muted-foreground">{t('no_tricks')}</p>
+        <p className="text-sm text-muted-foreground/70">{t('be_first')}</p>
       </div>
     )
   }
@@ -77,6 +78,7 @@ export function TrickList() {
           trick={trick} 
           currentUser={currentUser} 
           onUpdate={handleTrickUpdated} 
+          t={t}
         />      
       ))}
     </div>
@@ -84,17 +86,16 @@ export function TrickList() {
 }
 
 function TrickCard({
-  trick, currentUser, onUpdate 
+  trick, currentUser, onUpdate, t
 }: {
-  trick: Trick; currentUser: any; onUpdate: (trick: Trick) => void
+  trick: Trick; currentUser: any; onUpdate: (trick: Trick) => void; t: any
 }) {
   const [isPlaying, setIsPlaying] = useState(false)
-  const t = useTranslations();
-
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [editForm, setEditForm] = useState({
     name: trick.name,
+    category: trick.category,
     description: trick.description || '',
     privacy: trick.privacy,
   })
@@ -109,6 +110,7 @@ function TrickCard({
       .from('tricks')
       .update({
         name: editForm.name,
+        category: editForm.category,
         description: editForm.description,
         privacy: editForm.privacy,
       })
@@ -195,12 +197,12 @@ function TrickCard({
 
       {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
       {isPlaying && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12">
           
           {/* 右上角關閉按鈕 */}
           <button 
             onClick={() => setIsPlaying(false)}
-            className="absolute right-4 top-4 z-50 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25 sm:right-8 sm:top-8"
+            className="fixed right-4 top-4 z-50 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25 sm:right-8 sm:top-8"
           >
             <X className="h-6 w-6 sm:h-8 sm:w-8" />
           </button>
@@ -211,20 +213,22 @@ function TrickCard({
             <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">{trick.name}</h2>
             <TrickPlayer videoId={trick.video_id} />
             {trick.description && (
-              <p className="mt-4 text-sm text-white/80 whitespace-pre-wrap max-w-3xl">
-                {trick.description}
-              </p>
+              <div className="mt-6 rounded-lg bg-white/5 p-4 border border-white/10 shadow-lg">
+                <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed">
+                  {trick.description}
+                </p>
+              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ✏️ [新增] 修改招式 Modal */}
+      {/* ✏️ 修改招式 Modal */}
       {isEditing && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md rounded-xl border bg-card p-6 text-card-foreground shadow-lg animate-in zoom-in-95 duration-200">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-xl font-bold">修改招式資訊</h2>
+              <h2 className="text-xl font-bold">{t('edit_title')}</h2>
               <button onClick={() => setIsEditing(false)} className="rounded-full p-1 hover:bg-muted">
                 <X className="h-5 w-5" />
               </button>
@@ -232,7 +236,7 @@ function TrickCard({
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium">招式名稱</label>
+                <label className="mb-1.5 block text-sm font-medium">{t('trick_name')}</label>
                 <input
                   type="text"
                   value={editForm.name}
@@ -242,35 +246,45 @@ function TrickCard({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium">權限設定</label>
+                <label className="mb-1.5 block text-sm font-medium">{t('category')}</label>
+                <input 
+                  type="text"
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({...editForm, category: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium">{t('privacy_setting')}</label>
                 <select
                   value={editForm.privacy}
                   onChange={(e) => setEditForm({...editForm, privacy: e.target.value as 'public' | 'private'})}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <option value="public">公開 (所有人可見)</option>
-                  <option value="private">私人 (僅自己可見)</option>
+                  <option value="public">{t('public_visibility')}</option>
+                  <option value="private">{t('private_visibility')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium">招式筆記 / 描述</label>
+                <label className="mb-1.5 block text-sm font-medium">{t('trick_notes')}</label>
                 <textarea
                   rows={4}
                   value={editForm.description}
                   onChange={(e) => setEditForm({...editForm, description: e.target.value})}
                   className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
-                  placeholder="寫下練習的心得或重點..."
+                  placeholder={t('notes_placeholder')}
                 />
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
                 <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isSaving}>
-                  取消
+                  {t('cancel')}
                 </Button>
                 <Button onClick={handleSave} disabled={isSaving || !editForm.name.trim()}>
                   {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {isSaving ? '儲存中...' : '儲存修改'}
+                  {isSaving ? t('saving') : t('save_changes')}
                 </Button>
               </div>
             </div>

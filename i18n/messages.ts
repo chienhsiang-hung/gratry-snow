@@ -55,6 +55,22 @@ const translations = {
   submit_upload: { en: 'Confirm & Upload', zh: '確認並上傳' },
   private: { en: 'Private', zh: '私人' },
   public: { en: 'Public', zh: '公開' },
+
+  // === 以下為 TrickList 新增的翻譯 ===
+  loading: { en: 'Loading...', zh: '載入中...' },
+  no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
+  be_first: { en: 'Click "Add Trick" at the top right to be the first to upload!', zh: '趕快點擊右上角的新增招式，成為第一個上傳的人吧！' },
+  edit_tooltip: { en: 'Edit trick', zh: '修改招式' },
+  edit_title: { en: 'Edit Trick Information', zh: '修改招式資訊' },
+  privacy_setting: { en: 'Privacy Setting', zh: '權限設定' },
+  public_visibility: { en: 'Public (Visible to everyone)', zh: '公開 (所有人可見)' },
+  private_visibility: { en: 'Private (Only visible to you)', zh: '私人 (僅自己可見)' },
+  trick_notes: { en: 'Notes / Description', zh: '招式筆記 / 描述' },
+  notes_placeholder: { en: 'Write down your practice notes or tips...', zh: '寫下練習的心得或重點...' },
+  cancel: { en: 'Cancel', zh: '取消' },
+  saving: { en: 'Saving...', zh: '儲存中...' },
+  save_changes: { en: 'Save Changes', zh: '儲存修改' },
+  update_failed: { en: 'Failed to update. Please try again later.', zh: '更新失敗，請稍後再試' }
 };
 
 export type Locale = 'en' | 'zh';
