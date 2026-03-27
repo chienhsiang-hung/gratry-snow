@@ -7,9 +7,13 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import Navbar from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner"
+import { routing } from '@/i18n/routing';
+import { notFound } from 'next/navigation';
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'zh' }];
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -37,6 +41,9 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
   setRequestLocale(locale);
 
   const messages = await getMessages();

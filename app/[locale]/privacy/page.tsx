@@ -1,11 +1,18 @@
 import { setRequestLocale } from 'next-intl/server';
+import { routing } from '@/i18n/routing';
 
-export default function PrivacyPolicyPage({ 
-  params: { locale } 
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function PrivacyPolicyPage({ 
+  params 
 }: { 
-  params: { locale: string } 
+  params: Promise<{ locale: string }> 
 }) {
-  setRequestLocale(locale);
+  const { locale } = await params;
+setRequestLocale(locale);
 
   return (
     <div className="container mx-auto max-w-4xl py-12 px-4 sm:px-6">

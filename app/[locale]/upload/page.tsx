@@ -2,6 +2,12 @@
 import { UploadTrickForm } from "@/components/upload-trick-form";
 import { setRequestLocale } from "next-intl/server";
 import AuthGuard from "@/components/auth-guard";
+import { routing } from '@/i18n/routing';
+
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 export default async function UploadPage({
   params
