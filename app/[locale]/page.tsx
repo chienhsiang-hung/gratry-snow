@@ -30,7 +30,7 @@ export default async function Home({
           alt="Gratry Snow Logo" 
           width={80} 
           height={80} 
-          className="mb-2 drop-shadow-md hover:scale-105 transition-transform duration-300 dark:brightness-0 dark:invert"
+          className="mb-2 drop-shadow-md hover:scale-105 transition-transform duration-300"
           priority // 首圖建議加上 priority 提升 LCP
         />
         <h1 className="text-4xl font-bold tracking-tight">Gratry Snow</h1>
