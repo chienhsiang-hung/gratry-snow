@@ -3,9 +3,7 @@ import "../globals.css";
 import { cn } from "@/lib/utils";
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://chienhsiang-hung.github.io'),
-  
+export const metadata: Metadata = {  
   title: "Gratry Snow | Snowboard Ground Trick Library",
   description: "Your ultimate snowboard ground tricks library and notes. Upload, mute, and organize your Gratry practice videos.",
   keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding"],
