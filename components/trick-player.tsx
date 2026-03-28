@@ -18,6 +18,33 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
+  // 🚀 新增：用來判斷是否為直式影片 (Shorts/Reels)
+  const [isVertical, setIsVertical] = useState(false);
+
+  // 🚀 新增：透過 YouTube oEmbed API 獲取影片原始比例
+  useEffect(() => {
+    const checkVideoFormat = async () => {
+      try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/shorts/${videoId}&format=json`);
+        if (res.ok) {
+          const data = await res.json();
+          // 如果寬度小於高度，代表這是直式影片 (Shorts)
+          if (data.width && data.height && data.width < data.height) {
+            setIsVertical(true);
+          } else {
+            setIsVertical(false);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch video metadata", e);
+      }
+    };
+
+    if (videoId) {
+      checkVideoFormat();
+    }
+  }, [videoId]);
+
   const onReady = (event: YouTubeEvent) => {
     const ytPlayer = event.target;
     setPlayer(ytPlayer);
@@ -85,10 +112,14 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   };
 
   return (
-    <div className="group w-full space-y-4">
-      {/* 影片播放區塊：增加邊框與發光效果 */}
+    // 🚀 修改：如果偵測到是直式影片，就限制最大寬度並置中，看起來才像手機
+    <div className={`group w-full space-y-4 mx-auto transition-all duration-500 ${isVertical ? 'max-w-[400px]' : 'max-w-full'}`}>
+      
+      {/* 🚀 修改：根據 isVertical 切換為 aspect-[9/16] 或是 aspect-video (16:9) */}
       <div 
-        className={`relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 shadow-2xl transition-transform duration-500 ${
+        className={`relative w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 shadow-2xl transition-all duration-500 ${
+          isVertical ? 'aspect-[9/16]' : 'aspect-video'
+        } ${
           isMirrored ? '-scale-x-100' : ''
         }`}
       >
@@ -115,7 +146,7 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
         />
       </div>
 
-      {/* 控制面板：升級為毛玻璃質感 (Glassmorphism) */}
+      {/* 控制面板 */}
       <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition-all duration-300">
         
         {/* 第一排：進度條與播放按鈕 */}
