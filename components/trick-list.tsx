@@ -70,10 +70,32 @@ export function TrickList() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+      <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {[...Array(8)].map((_, i) => (
+          <div 
+            key={i} 
+            className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm animate-in fade-in duration-500"
+          >
+            {/* 1. 影片縮圖：使用 5% 不透明度 */}
+            <div className="aspect-video w-full bg-black/5 dark:bg-white/5 animate-pulse" />
+            
+            <div className="flex flex-1 flex-col p-4 gap-4">
+              <div className="flex items-start justify-between gap-4">
+                {/* 2. 標題與難度：顏色稍微加深，使用 10% 不透明度 */}
+                <div className="h-6 w-2/3 rounded-md bg-black/10 dark:bg-white/10 animate-pulse" />
+                <div className="h-5 w-12 shrink-0 rounded-full bg-black/10 dark:bg-white/10 animate-pulse" />
+              </div>
+              
+              <div className="mt-auto flex gap-2 pt-2">
+                {/* 3. 底部標籤：退回 5% 不透明度 */}
+                <div className="h-5 w-16 rounded-full bg-black/5 dark:bg-white/5 animate-pulse" />
+                <div className="h-5 w-14 rounded-full bg-black/5 dark:bg-white/5 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    )
+    );
   }
 
   if (tricks.length === 0) {
