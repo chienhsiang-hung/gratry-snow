@@ -124,6 +124,7 @@ const translations = {
   save: { en: 'Save', zh: '儲存' },
   require_login: { en: 'Please Log In', zh: '請先登入' },
   require_login_desc: { en: 'You need to log in to upload tricks.', zh: '您需要登入帳號才能上傳動作' },
+  profile: { en: 'Profile', zh: '個人資料' }
 };
 
 export type Locale = 'en' | 'zh';

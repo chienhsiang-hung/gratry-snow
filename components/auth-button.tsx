@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { User } from "@supabase/supabase-js";
 import { LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing"; // <-- 新增引入 Link
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,6 +73,18 @@ export default function AuthButton() {
               <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
             </div>
           </DropdownMenuLabel>
+          
+          <DropdownMenuSeparator />
+          
+          {/* --- 新增的 Profile 連結 --- */}
+          <DropdownMenuItem asChild>
+            <Link href="/profile" className="cursor-pointer w-full flex items-center">
+              <UserIcon className="mr-2 h-4 w-4" />
+              <span>{t('profile') || 'Profile'}</span>
+            </Link>
+          </DropdownMenuItem>
+          {/* ------------------------- */}
+          
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
