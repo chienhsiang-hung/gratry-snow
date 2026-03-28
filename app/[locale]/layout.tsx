@@ -87,7 +87,7 @@ export default async function RootLayout({
 
   const messages = await getMessages();
 
-return (
+  return (
     <html
       lang={locale}
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
@@ -101,12 +101,26 @@ return (
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            {/* 將內容用 flex 容器包起來，加入 Navbar */}
             <div className="relative flex min-h-screen flex-col">
               <Navbar />
               <main className="flex-1 flex flex-col">
                 {children}
               </main>
+
+              <footer className="border-t py-6 bg-background/95">
+                <div className="container mx-auto flex flex-col items-center justify-center gap-4 px-4 md:flex-row md:gap-8 text-sm text-muted-foreground">
+                  <p>© {new Date().getFullYear()} Gratry Snow. All rights reserved.</p>
+                  <div className="flex gap-4">
+                    <a href={`/${locale}/privacy`} className="hover:text-foreground transition-colors">
+                      Privacy Policy
+                    </a>
+                    <a href={`/${locale}/terms`} className="hover:text-foreground transition-colors">
+                      Terms of Service
+                    </a>
+                  </div>
+                </div>
+              </footer>
+
             </div>
           </NextIntlClientProvider>
           <Toaster position="top-center" />
