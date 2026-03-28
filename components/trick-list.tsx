@@ -78,11 +78,12 @@ export function TrickList() {
 
   if (tricks.length === 0) {
     return (
-      // 加入 px-6 並確保寬度 100%
-      <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed bg-muted/30 py-32 px-6 text-center">
-        <p className="text-lg font-medium text-muted-foreground">{t('no_tricks')}</p>
-        {/* 限制文字最大寬度，避免在窄螢幕上看起來太擠 */}
-        <p className="mt-2 max-w-[300px] text-sm text-muted-foreground/70 sm:max-w-none">
+      <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/25 bg-muted/10 py-32 px-6 text-center animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Play className="h-8 w-8 ml-1 opacity-80" />
+        </div>
+        <p className="text-xl font-semibold text-foreground mb-2">{t('no_tricks')}</p>
+        <p className="max-w-[300px] text-sm text-muted-foreground sm:max-w-none">
           {t('be_first')}
         </p>
       </div>
@@ -188,7 +189,7 @@ function TrickCard({
   return (
     <>
       {/* 這是原本的卡片 (永遠只顯示縮圖與資訊) */}
-      <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
+      <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/30 animate-in fade-in zoom-in-95">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
             <img 

@@ -180,23 +180,26 @@ export function UploadTrickForm() {
   // ==========================================
   if (isSuccess) {
     return (
-      <div className="w-full max-w-2xl space-y-6 rounded-xl border bg-card p-8 shadow-sm text-center animate-in zoom-in-95 duration-300">
+      <div className="w-full max-w-2xl space-y-6 rounded-2xl border bg-card p-10 shadow-lg text-center animate-in zoom-in-95 duration-500">
         <div className="flex justify-center">
-          <CheckCircle2 className="h-16 w-16 text-green-500" />
+          <div className="rounded-full bg-green-500/10 p-4 animate-in zoom-in duration-500 delay-150">
+            {/* 替打勾加上 animate-bounce 或縮放效果 */}
+            <CheckCircle2 className="h-16 w-16 text-green-500 drop-shadow-sm" />
+          </div>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">{t("upload_success")}</h2>
-          <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+        <div className="space-y-3">
+          <h2 className="text-3xl font-extrabold tracking-tight">{t("upload_success")}</h2>
+          <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto">
             {t("youtube_processing_desc")}
           </p>
         </div>
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button asChild className="w-full sm:w-auto">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button asChild size="lg" className="w-full sm:w-auto font-medium transition-transform hover:scale-105">
             <Link href="/">
               {t("back_to_home")}
             </Link>
           </Button>
-          <Button variant="outline" onClick={handleResetForm} className="w-full sm:w-auto">
+          <Button variant="outline" size="lg" onClick={handleResetForm} className="w-full sm:w-auto font-medium transition-transform hover:scale-105">
             {t("upload_another")}
           </Button>
         </div>
@@ -220,11 +223,15 @@ export function UploadTrickForm() {
       <div className="space-y-6">
         {/* 影片檔案上傳區塊 */}
         <div className="flex w-full flex-col items-center justify-center gap-2">
+          {/* 影片檔案上傳區塊 */}
           {!file ? (
-            <label htmlFor="video-upload" className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:bg-muted">
+            <label htmlFor="video-upload" className="group flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/25 bg-muted/30 transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
               <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                <UploadCloud className="mb-3 h-8 w-8 text-muted-foreground" />
-                <p className="mb-2 text-sm font-medium text-foreground">{t("click_to_upload")}</p>
+                {/* 讓 Icon 有浮起放大的感覺 */}
+                <div className="mb-4 rounded-full bg-background p-4 shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:shadow-md">
+                  <UploadCloud className="h-8 w-8 text-muted-foreground transition-colors group-hover:text-primary" />
+                </div>
+                <p className="mb-2 text-sm font-semibold text-foreground">{t("click_to_upload")}</p>
                 <p className="text-xs text-muted-foreground">{t("support_formats")}</p>
               </div>
               <input 
@@ -237,7 +244,8 @@ export function UploadTrickForm() {
               />
             </label>
           ) : (
-            <div className="flex w-full items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+            // 已選擇檔案的 UI，稍微增加圓角與邊距
+            <div className="flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/5 p-4 transition-all animate-in zoom-in-95">
               <div className="flex items-center space-x-3 overflow-hidden">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
                   <UploadCloud className="h-5 w-5 text-primary" />
