@@ -100,7 +100,8 @@ const translations = {
     en: 'Muting video {progress}%', 
     zh: '影片靜音處理中 {progress}%' 
   },
-  // === 以下為 TrickList 新增的翻譯 ===
+  
+  // === TrickList ===
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
   be_first: { en: 'Click "Add Trick" at the top right to be the first to upload!', zh: '趕快點擊右上角的新增招式，成為第一個上傳的人吧！' },
@@ -124,7 +125,13 @@ const translations = {
   save: { en: 'Save', zh: '儲存' },
   require_login: { en: 'Please Log In', zh: '請先登入' },
   require_login_desc: { en: 'You need to log in to upload tricks.', zh: '您需要登入帳號才能上傳動作' },
-  profile: { en: 'Profile', zh: '個人資料' }
+  
+  profile: { en: 'Profile', zh: '個人資料' },
+  avatar: { en: 'Avatar', zh: '大頭貼' },
+  default_name: { en: 'Snowboarder', zh: '滑雪者' },
+  status: { en: 'Status', zh: '狀態' },
+  active: { en: 'Active', zh: '活躍' },
+  provider: { en: 'Provider', zh: '登入方式' },
 };
 
 export type Locale = 'en' | 'zh';

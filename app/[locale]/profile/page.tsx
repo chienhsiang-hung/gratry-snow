@@ -21,7 +21,7 @@ export default function ProfilePage() {
     <AuthGuard>
       <div className="container mx-auto px-4 py-12 max-w-3xl animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h1 className="text-3xl font-bold tracking-tight mb-8">
-          {t('profile') || 'User Profile'}
+          {t('profile')} {/* 這裡原本的 || 'User Profile' 拿掉，直接套用翻譯 */}
         </h1>
 
         {user && (
@@ -32,7 +32,7 @@ export default function ProfilePage() {
               {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
                 <img 
                   src={user.user_metadata?.avatar_url || user.user_metadata?.picture} 
-                  alt={user.user_metadata?.full_name || 'Avatar'}
+                  alt={user.user_metadata?.full_name || t('avatar')}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -47,22 +47,30 @@ export default function ProfilePage() {
             <div className="flex flex-col space-y-3 text-center sm:text-left w-full">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  {user.user_metadata?.full_name || 'Snowboarder'}
+                  {user.user_metadata?.full_name || t('default_name')}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   {user.email}
                 </p>
               </div>
 
-              {/* 這裡未來可以擴充：例如使用者上傳的 Tricks 數量、喜歡的 Tricks 等 */}
+              {/* 狀態區塊 */}
               <div className="grid grid-cols-2 gap-4 pt-4 mt-4 border-t border-border/40">
                 <div className="bg-muted/30 p-4 rounded-xl">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Status</p>
-                  <p className="font-medium text-primary">Active</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                    {t('status')}
+                  </p>
+                  <p className="font-medium text-primary">
+                    {t('active')}
+                  </p>
                 </div>
                 <div className="bg-muted/30 p-4 rounded-xl">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Provider</p>
-                  <p className="font-medium capitalize">{user.app_metadata.provider}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                    {t('provider')}
+                  </p>
+                  <p className="font-medium capitalize">
+                    {user.app_metadata.provider}
+                  </p>
                 </div>
               </div>
             </div>
