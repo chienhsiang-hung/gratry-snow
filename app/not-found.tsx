@@ -26,7 +26,7 @@ export default function NotFound() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    const basePath = '/gratry-snow';
+    const basePath = '';
     
     const cleanPath = path.startsWith(basePath) 
       ? path.slice(basePath.length) 
@@ -64,7 +64,7 @@ export default function NotFound() {
                   <div className="relative flex items-center justify-center">
                     <div className="absolute h-20 w-20 animate-ping rounded-full bg-primary/20"></div>
                     <Image 
-                      src="/gratry-snow/logo.svg" 
+                      src="/logo.svg" 
                       alt="Loading..." 
                       width={48} 
                       height={48} 
@@ -86,7 +86,7 @@ export default function NotFound() {
                 // --- 404 狀態 ---
                 <div className="flex flex-col items-center">
                   <Image 
-                    src="/gratry-snow/logo.svg" 
+                    src="/logo.svg" 
                     alt="Gratry Snow Logo" 
                     width={96} 
                     height={96} 
@@ -104,7 +104,7 @@ export default function NotFound() {
                   </p>
                   
                   <button 
-                    onClick={() => window.location.href = '/gratry-snow/en'}
+                    onClick={() => window.location.href = '/en'}
                     className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground shadow-lg transition-all duration-300 hover:scale-105 hover:bg-primary/90 hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
                   >
                     <span className="mr-2">Return to Base Camp</span>

@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   description: "Your ultimate snowboard ground tricks library and notes. Upload, mute, and organize your Gratry practice videos.",
   keywords: ["snowboard", "gratry", "ground tricks", "flatland", "snowboarding"],
   icons: {
-    icon: '/gratry-snow/favicon.ico',
-    apple: '/gratry-snow/apple-touch-icon.png',
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   openGraph: {
     title: "Gratry Snow | Snowboard Ground Trick Library",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "Gratry Snow",
     images: [
       {
-        url: '/gratry-snow/og-image.svg', 
+        url: '/og-image.svg', 
         width: 1200,
         height: 630,
         alt: "Gratry Snow Preview",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Gratry Snow | Snowboard Ground Trick Library",
     description: "Your ultimate snowboard ground tricks library and notes.",
-    images: ['/gratry-snow/og-image.svg'],
+    images: ['/og-image.svg'],
   },
 };
 

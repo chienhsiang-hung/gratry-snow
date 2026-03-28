@@ -48,7 +48,7 @@ export default function Navbar() {
               <SheetHeader className="p-6 text-left border-b border-border/20">
                 <SheetTitle className="flex items-center gap-2 font-bold text-2xl tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                   <Image
-                    src="/gratry-snow/logo.svg"
+                    src="/logo.svg"
                     alt="Gratry Snow Logo"
                     width={28}
                     height={28}
@@ -104,7 +104,7 @@ export default function Navbar() {
           <Link href="/" className="group flex items-center gap-2 transition-all duration-300">
             <div className="relative flex items-center justify-center">
               <Image 
-                src="/gratry-snow/logo.svg" 
+                src="/logo.svg" 
                 alt="Gratry Snow Logo" 
                 width={32} 
                 height={32} 

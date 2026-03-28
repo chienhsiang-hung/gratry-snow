@@ -30,14 +30,6 @@ export default async function Home({
 
       {/* Hero 區塊：加上 animate-in 與 slide-in 動畫 */}
       <div className="relative z-10 flex flex-col items-center text-center space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out">
-        {/* <Image 
-          src="/gratry-snow/logo.svg" 
-          alt="Gratry Snow Logo" 
-          width={88} 
-          height={88} 
-          className="mb-2 drop-shadow-xl transition-all duration-500 hover:scale-110 hover:rotate-3"
-          priority
-        /> */}
         {/* 標題改用漸層文字 */}
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/70">
           Gratry Snow
