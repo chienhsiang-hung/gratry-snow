@@ -13,21 +13,19 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   const [isMirrored, setIsMirrored] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  // 💡 預設改為 false，等 YouTube 真正開始播放時再變 true，避免被瀏覽器阻擋自動播放時狀態不同步
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isDragging, setIsDragging] = useState(false); // 判斷使用者是否正在拖拉進度條
+  const [isDragging, setIsDragging] = useState(false);
 
   const onReady = (event: YouTubeEvent) => {
     const ytPlayer = event.target;
     setPlayer(ytPlayer);
     ytPlayer.mute();
     setIsMuted(true);
-    setDuration(ytPlayer.getDuration()); // 取得影片總長度
+    setDuration(ytPlayer.getDuration());
   };
 
-  // 💡 直接吃 YouTube 官方的事件，確保按鈕狀態 100% 同步
   const handlePlay = (event: YouTubeEvent) => {
     setIsPlayingVideo(true);
     setDuration(event.target.getDuration() || 0);
@@ -35,7 +33,6 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   const handlePause = () => setIsPlayingVideo(false);
   const handleEnd = () => setIsPlayingVideo(false);
 
-  // 進度條同步
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (player && isPlayingVideo && !isDragging) {
@@ -47,7 +44,6 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
     return () => clearInterval(interval);
   }, [player, isPlayingVideo, isDragging]);
 
-  // 播放與暫停控制
   const togglePlayPause = () => {
     if (player) {
       if (isPlayingVideo) {
@@ -60,9 +56,9 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
 
   const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value);
-    setCurrentTime(time); // 讓畫面即時跟著拖拉的數值變動
+    setCurrentTime(time);
     if (player) {
-      player.seekTo(time, true); // 命令 YouTube 跳轉到該秒數
+      player.seekTo(time, true);
     }
   };
 
@@ -89,10 +85,10 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
   };
 
   return (
-    <div className="space-y-3 w-full">
-      {/* 影片播放區塊 (單獨翻轉這塊) */}
+    <div className="group w-full space-y-4">
+      {/* 影片播放區塊：增加邊框與發光效果 */}
       <div 
-        className={`relative aspect-video w-full overflow-hidden rounded-xl bg-black transition-transform duration-500 ${
+        className={`relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/10 shadow-2xl transition-transform duration-500 ${
           isMirrored ? '-scale-x-100' : ''
         }`}
       >
@@ -102,77 +98,85 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
             width: '100%',
             height: '100%',
             playerVars: {
-              autoplay: 1, // 自動播放
-              rel: 0,      // 不顯示無關的推薦影片
-              modestbranding: 1, // 隱藏 YouTube Logo
-              controls: 0, // 💡 魔法在這裡：關閉原生 YouTube 控制列！
-              disablekb: 1, // 關閉 YouTube 預設鍵盤控制，以免干擾
-              playsinline: 1, // 避免 iOS 自動全螢幕彈出
+              autoplay: 1,
+              rel: 0,
+              modestbranding: 1,
+              controls: 0,
+              disablekb: 1,
+              playsinline: 1,
             }
           }}
           onReady={onReady}
-          onPlay={handlePlay}     // ✨ 綁定官方事件
-          onPause={handlePause}   // ✨ 綁定官方事件
-          onEnd={handleEnd}       // ✨ 綁定官方事件
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onEnd={handleEnd}
           className="absolute inset-0 h-full w-full pointer-events-none"
           iframeClassName="h-full w-full border-0"
         />
       </div>
 
-      {/* 控制面板 */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border bg-muted/40 p-3 shadow-sm">
+      {/* 控制面板：升級為毛玻璃質感 (Glassmorphism) */}
+      <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-black/40 p-4 shadow-xl backdrop-blur-xl transition-all duration-300">
         
         {/* 第一排：進度條與播放按鈕 */}
-        <div className="flex items-center gap-3 w-full px-1">
+        <div className="flex items-center gap-4 w-full px-1">
           <button 
             onClick={togglePlayPause} 
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground hover:shadow-[0_0_15px_rgba(var(--primary),0.5)]"
           >
-            {isPlayingVideo ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
+            {isPlayingVideo ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current ml-1" />}
           </button>
 
-          <span className="text-xs font-medium tabular-nums text-muted-foreground w-10 text-right shrink-0">
+          <span className="text-xs font-medium tabular-nums text-white/70 w-9 text-right shrink-0">
             {formatTime(currentTime)}
           </span>
 
-          {/* 超順暢原生 Range 進度條 */}
-          <input
-            type="range"
-            min={0}
-            max={duration || 1}
-            step="0.01"
-            value={currentTime}
-            onPointerDown={() => setIsDragging(true)}
-            onPointerUp={() => setIsDragging(false)}
-            onChange={handleSeekChange}
-            className="flex-1 h-1.5 cursor-pointer rounded-full bg-muted-foreground/30"
-            // 使用內聯樣式將左側進度塗上主色 (取代 accent-color 達到更完美的 UI)
-            style={{
-              background: `linear-gradient(to right, hsl(var(--primary)) ${(currentTime / (duration || 1)) * 100}%, transparent ${(currentTime / (duration || 1)) * 100}%)`
-            }}
-          />
+          {/* 進度條 */}
+          <div className="relative flex-1 group/slider flex items-center h-4 cursor-pointer">
+            <input
+              type="range"
+              min={0}
+              max={duration || 1}
+              step="0.01"
+              value={currentTime}
+              onPointerDown={() => setIsDragging(true)}
+              onPointerUp={() => setIsDragging(false)}
+              onChange={handleSeekChange}
+              className="absolute inset-0 w-full opacity-0 cursor-pointer z-10"
+            />
+            {/* 自訂進度條視覺 */}
+            <div className="h-1.5 w-full rounded-full bg-white/20 overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-75 ease-linear"
+                style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+              />
+            </div>
+            {/* 拖拉點 (Thumb) */}
+            <div 
+              className="absolute h-3 w-3 rounded-full bg-white shadow-md transition-transform scale-0 group-hover/slider:scale-100"
+              style={{ left: `calc(${(currentTime / (duration || 1)) * 100}% - 6px)` }}
+            />
+          </div>
 
-          <span className="text-xs font-medium tabular-nums text-muted-foreground w-10 shrink-0">
+          <span className="text-xs font-medium tabular-nums text-white/50 w-9 shrink-0">
             {formatTime(duration)}
           </span>
         </div>
 
         {/* 第二排：實用工具區 (速度, 靜音, 視角) */}
         <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-          <div className="flex items-center gap-2">
-            <span className="mr-1 text-sm font-semibold text-muted-foreground">{t('speed')}</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="mr-1 hidden sm:inline-block text-xs font-semibold uppercase tracking-wider text-white/40">{t('speed')}</span>
               {[0.25, 0.5, 0.75, 1].map((rate) => (
                 <Button
                   key={rate}
-                  variant={playbackRate === rate ? "default" : "outline"}
+                  variant="ghost"
                   size="sm"
                   onClick={() => changeSpeed(rate)}
-                  // 💡 修改這裡：特別針對劇院模式的深色背景，強制設定未選中狀態的配色
-                  className={`h-8 px-2.5 text-xs font-medium transition-all ${
-                    playbackRate !== rate
-                      // 未選中狀態：強制白色文字、淡色邊框、Hover 時更亮
-                      ? 'text-white/90 border-white/20 hover:bg-white/10 hover:text-white' 
-                      : '' // 選中狀態保持原本的 variant="default" 配色
+                  className={`h-7 px-2 text-xs font-medium rounded-full transition-all ${
+                    playbackRate === rate
+                      ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90' 
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                  {rate}x
@@ -182,22 +186,26 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={toggleMute}
-              className="h-8 w-8 p-0 text-muted-foreground"
+              className="h-8 w-8 rounded-full p-0 text-white/70 hover:bg-white/10 hover:text-white"
               title={isMuted ? t('unmute') : t('mute')}
             >
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </Button>
 
             <Button
-              variant={isMirrored ? "default" : "secondary"}
+              variant={isMirrored ? "default" : "outline"}
               size="sm"
               onClick={() => setIsMirrored(!isMirrored)}
-              className="h-8 gap-1.5 px-3 text-xs font-medium"
+              className={`h-8 gap-1.5 px-3 text-xs font-medium rounded-full transition-all border-white/10 ${
+                isMirrored 
+                  ? 'bg-primary border-primary text-primary-foreground' 
+                  : 'bg-white/5 text-white/90 hover:bg-white/15'
+              }`}
             >
-              <FlipHorizontal className="h-4 w-4" />
+              <FlipHorizontal className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">
                 {isMirrored ? t('regular_stance') : t('goofy_stance')}
               </span>

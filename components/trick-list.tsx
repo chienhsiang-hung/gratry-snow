@@ -243,56 +243,60 @@ function TrickCard({
           </div>
         </div>
 
-      {/* 🚀 魔法在這裡：全螢幕劇院模式 (Lightbox) */}
+      {/* 🚀 升級版：全螢幕劇院模式 (Lightbox) */}
       {isPlaying && (
         <div
-          className="dark fixed inset-0 z-50 flex flex-col items-center justify-start bg-black/95 px-4 backdrop-blur-sm sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12"
+          className="dark fixed inset-0 z-100 flex flex-col items-center justify-start bg-black/80 px-4 backdrop-blur-xl sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12 animate-in fade-in duration-300 ease-out"
           onClick={() => setIsPlaying(false)}
         >
+          {/* 背景的微弱光暈，增加空間感 */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
           
-          {/* 右上角關閉按鈕 */}
+          {/* 右上角關閉按鈕：加上群組 hover 旋轉與放大動畫 */}
           <button 
             onClick={() => {
               setIsPlaying(false);
-              setIsEditingNote(false); // 關閉筆記編輯（如果開著的話）
+              setIsEditingNote(false);
             }}
-            className="fixed right-4 top-4 z-50 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/25 sm:right-8 sm:top-8"
+            className="group fixed right-4 top-4 z-50 rounded-full bg-white/10 p-2 sm:p-3 text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:scale-110 sm:right-8 sm:top-8 border border-white/5"
           >
-            <X className="h-6 w-6 sm:h-8 sm:w-8" />
+            <X className="h-5 w-5 sm:h-6 sm:w-6 transition-transform duration-300 group-hover:rotate-90" />
           </button>
 
           {/* 放大版的播放器容器 */}
           <div
-            className="w-full max-w-5xl animate-in fade-in zoom-in-95 duration-200"
+            className="relative w-full max-w-5xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-500 ease-out"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-4 text-xl font-bold text-white sm:text-2xl">{trick.name}</h2>
+            <h2 className="mb-6 text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-md">
+              {trick.name}
+            </h2>
+            
             <TrickPlayer videoId={trick.video_id} />
 
-            <div className="mt-6 w-full">
+            {/* 筆記區塊升級 */}
+            <div className="mt-8 w-full">
               {isEditingNote ? (
-                <div className="rounded-lg bg-white/10 p-4 border border-white/20 shadow-lg flex flex-col gap-3">
+                <div className="rounded-2xl bg-black/40 p-5 border border-white/10 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-2 duration-300">
                   <textarea
-                    className="w-full bg-black/40 text-white rounded-md p-3 text-sm focus:outline-none focus:ring-1 focus:ring-white/50 resize-none placeholder:text-white/40"
-                    rows={5}
+                    className="w-full bg-white/5 text-white rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none placeholder:text-white/30 border border-white/5"
+                    rows={4}
                     value={tempNote}
                     onChange={(e) => setTempNote(e.target.value)}
                     placeholder={t('notes_placeholder')}
                     autoFocus
                   />
-                  <div className="flex justify-end gap-2 mt-2">
+                  <div className="flex justify-end gap-3 mt-4">
                     <Button 
                       variant="ghost" 
-                      className="text-white hover:bg-white/20 hover:text-white" 
-                      size="sm"
+                      className="text-white/70 hover:bg-white/10 hover:text-white rounded-full" 
                       onClick={() => { setIsEditingNote(false); setTempNote(trick.description || ''); }} 
                       disabled={isSavingNote}
                     >
                       {t('cancel')}
                     </Button>
                     <Button
-                      size="sm" 
-                      className="bg-primary text-primary-foreground hover:bg-primary/90" 
+                      className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(var(--primary),0.3)] transition-all hover:shadow-[0_0_20px_rgba(var(--primary),0.6)]" 
                       onClick={handleSaveNote} 
                       disabled={isSavingNote}
                     >
@@ -302,14 +306,12 @@ function TrickCard({
                   </div>
                 </div>
               ) : (
-                // 只有擁有者，或是本身已經有筆記時，才顯示這個區塊
                 (trick.description || isOwner) && (
-                  <div className="group relative rounded-lg bg-white/5 p-4 border border-white/10 shadow-lg transition-colors hover:bg-white/10">
-                    {/* 如果是擁有者，右上角顯示隱藏的編輯按鈕 (Hover 時出現) */}
+                  <div className="group relative rounded-2xl bg-white/5 p-6 border border-white/5 shadow-xl transition-all duration-300 hover:bg-white/10 hover:border-white/10 backdrop-blur-sm">
                     {isOwner && (
                       <button 
                         onClick={() => { setTempNote(trick.description || ''); setIsEditingNote(true); }}
-                        className="absolute right-3 top-3 rounded p-1.5 text-white/60 md:opacity-0 transition-opacity hover:bg-white/20 hover:text-white group-hover:opacity-100"
+                        className="absolute right-4 top-4 rounded-full p-2 text-white/40 md:opacity-0 transition-all hover:bg-primary/20 hover:text-primary group-hover:opacity-100"
                         title={t('edit_note')}
                       >
                         <Edit className="h-4 w-4" />
@@ -317,13 +319,15 @@ function TrickCard({
                     )}
 
                     {trick.description ? (
-                      <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed pr-8">
-                        {trick.description}
-                      </p>
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">Director's Notes</h4>
+                        <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed pr-8 font-light">
+                          {trick.description}
+                        </p>
+                      </div>
                     ) : (
-                      // 如果沒有筆記，提示擁有者點擊新增
-                      <p className="text-sm italic text-white/40 cursor-pointer pr-8" onClick={() => setIsEditingNote(true)}>
-                        {t('notes_placeholder')} ({t('edit_note')})
+                      <p className="text-sm italic text-white/40 cursor-pointer pr-8 hover:text-white/60 transition-colors" onClick={() => setIsEditingNote(true)}>
+                        + {t('notes_placeholder')} ({t('edit_note')})
                       </p>
                     )}
                   </div>

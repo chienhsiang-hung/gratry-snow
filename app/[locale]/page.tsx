@@ -47,7 +47,7 @@ export default async function Home({
         </p>
       </div>
 
-      <div className="w-full relative z-10">
+      <div className="w-full">
         <TrickList />
       </div>
     </main>
