@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export default function Navbar() {
   const t = useTranslations();
@@ -44,7 +45,15 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] p-0 bg-background/80 backdrop-blur-xl border-r-border/50 flex flex-col"> 
               <SheetHeader className="p-6 text-left border-b border-border/50">
-                <SheetTitle className="font-bold text-2xl tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <SheetTitle className="flex items-center gap-2 font-bold text-2xl tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                  <Image
+                    src="/gratry-snow/logo.svg"
+                    alt="Gratry Snow Logo"
+                    width={28}
+                    height={28}
+                    className="drop-shadow-sm"
+                    priority
+                  />
                   Gratry Snow
                 </SheetTitle>
               </SheetHeader>
@@ -91,8 +100,16 @@ export default function Navbar() {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <span className="font-bold text-lg tracking-tight">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Image 
+              src="/gratry-snow/logo.svg" 
+              alt="Gratry Snow Logo" 
+              width={32} 
+              height={32} 
+              className="drop-shadow-sm"
+              priority
+            />
+            <span className="font-bold text-lg tracking-tight hidden sm:inline-block"> {/* 在極小螢幕可隱藏文字只留Logo */}
               Gratry Snow
             </span>
           </Link>
