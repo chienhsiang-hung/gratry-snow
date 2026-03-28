@@ -100,7 +100,36 @@ const translations = {
     en: 'Muting video {progress}%', 
     zh: '影片靜音處理中 {progress}%' 
   },
-  
+  // === 進度條 UI 新增的翻譯 ===
+  step_processing: { 
+    en: 'Processing Video...', 
+    zh: '處理影片中...' 
+  },
+  step_uploading: { 
+    en: 'Uploading to YouTube...', 
+    zh: '上傳至 YouTube...' 
+  },
+  step_saving: { 
+    en: 'Saving Data...', 
+    zh: '儲存資料中...' 
+  },
+  do_not_close: { 
+    en: 'Please do not close this window, it may take a few minutes.', 
+    zh: '請勿關閉視窗，這可能需要幾分鐘的時間' 
+  },
+  frontend_muting: { 
+    en: 'Frontend Muting', 
+    zh: '前端靜音處理' 
+  },
+  completed: { 
+    en: 'Completed', 
+    zh: '完成' 
+  },
+  saving_to_library: { 
+    en: 'Saving to Library', 
+    zh: '儲存至招式庫' 
+  },
+
   // === TrickList ===
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
