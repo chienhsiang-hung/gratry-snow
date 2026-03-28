@@ -7,9 +7,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import Navbar from "@/components/navbar";
 import { Toaster } from "@/components/ui/sonner"
-import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { routing, Link } from '@/i18n/routing';
 
 export const dynamicParams = false;
 
@@ -111,12 +111,12 @@ export default async function RootLayout({
                 <div className="container mx-auto flex flex-col items-center justify-center gap-4 px-4 md:flex-row md:gap-8 text-sm text-muted-foreground">
                   <p>© {new Date().getFullYear()} Gratry Snow. All rights reserved.</p>
                   <div className="flex gap-4">
-                    <a href={`/${locale}/privacy`} className="hover:text-foreground transition-colors">
+                    <Link href="/privacy" className="hover:text-foreground transition-colors">
                       Privacy Policy
-                    </a>
-                    <a href={`/${locale}/terms`} className="hover:text-foreground transition-colors">
+                    </Link>
+                    <Link href="/terms" className="hover:text-foreground transition-colors">
                       Terms of Service
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </footer>
