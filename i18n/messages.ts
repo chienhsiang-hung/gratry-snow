@@ -154,6 +154,10 @@ const translations = {
   save: { en: 'Save', zh: '儲存' },
   require_login: { en: 'Please Log In', zh: '請先登入' },
   require_login_desc: { en: 'You need to log in to upload tricks.', zh: '您需要登入帳號才能上傳動作' },
+  all_categories: { en: 'All', zh: '全部' },
+  search_placeholder: { en: 'Search trick name...', zh: '搜尋招式名稱...' },
+  no_tricks_in_category: { en: 'No tricks in this category yet', zh: '此分類目前還沒有招式' },
+  no_tricks_found: { en: 'No tricks match your search', zh: '找不到符合名稱的招式' },
   
   profile: { en: 'Profile', zh: '個人資料' },
   avatar: { en: 'Avatar', zh: '大頭貼' },

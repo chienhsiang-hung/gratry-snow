@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { TrickList } from "@/components/trick-list";
+import { TrickList } from "@/components/tricks/trick-list";
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';

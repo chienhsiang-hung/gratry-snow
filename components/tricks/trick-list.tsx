@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/supabase'
-import { Lock, Globe, Play, Loader2, Calendar, X, Edit } from 'lucide-react'
+import { Lock, Globe, Play, Loader2, Calendar, X, Edit, Search } from 'lucide-react'
 import { TrickPlayer } from './trick-player'
 import { useTranslations } from "next-intl"
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { TrickSkeleton } from './trick-skeleton';
 
 type Trick = {
   id: string
@@ -32,8 +33,22 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
   const [tricks, setTricks] = useState<Trick[]>(initialTricks)
   const [loading, setLoading] = useState(false) // 預設不再需要 loading
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const t = useTranslations()
   const router = useRouter()
+  const categories = ['All', 'Riding', 'Carving', 'Style', 'GroundTrick', 'Jump', 'Lock', 'Flip']
+  const filteredTricks = tricks.filter(trick => {
+    // 1. 檢查分類是否符合
+    const categoryMatch = selectedCategory === 'All' || trick.category === selectedCategory;
+    
+    // 2. 檢查招式名稱是否包含關鍵字 (忽略大小寫與前後空白)
+    const nameMatch = searchQuery.trim() === '' || 
+      trick.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
+      
+    // 兩者皆符合才顯示
+    return categoryMatch && nameMatch;
+  });
 
   useEffect(() => {
     setTricks(initialTricks)
@@ -63,35 +78,7 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
     )
   }
 
-  if (loading) {
-    return (
-      <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {[...Array(8)].map((_, i) => (
-          <div 
-            key={i} 
-            className="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm animate-in fade-in duration-500"
-          >
-            {/* 1. 影片縮圖：使用 5% 不透明度 */}
-            <div className="aspect-video w-full bg-black/5 dark:bg-white/5 animate-pulse" />
-            
-            <div className="flex flex-1 flex-col p-4 gap-4">
-              <div className="flex items-start justify-between gap-4">
-                {/* 2. 標題與難度：顏色稍微加深，使用 10% 不透明度 */}
-                <div className="h-6 w-2/3 rounded-md bg-black/10 dark:bg-white/10 animate-pulse" />
-                <div className="h-5 w-12 shrink-0 rounded-full bg-black/10 dark:bg-white/10 animate-pulse" />
-              </div>
-              
-              <div className="mt-auto flex gap-2 pt-2">
-                {/* 3. 底部標籤：退回 5% 不透明度 */}
-                <div className="h-5 w-16 rounded-full bg-black/5 dark:bg-white/5 animate-pulse" />
-                <div className="h-5 w-14 rounded-full bg-black/5 dark:bg-white/5 animate-pulse" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
+  if (loading) return <TrickSkeleton count={8} />;
 
   if (tricks.length === 0) {
     return (
@@ -108,16 +95,91 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {tricks.map((trick) => (
-        <TrickCard 
-          key={trick.id} 
-          trick={trick} 
-          currentUser={currentUser} 
-          onUpdate={handleTrickUpdated} 
-          t={t}
-        />      
-      ))}
+    <div className="flex w-full flex-col gap-6 md:gap-8">
+      
+      {/* ▼✨ 篩選控制區域：文字搜尋 + 分類按鈕 ▼ */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b pb-6">
+        
+        {/* 1. ✨ 文字搜尋框：佔據左側 */}
+        <div className="relative w-full md:max-w-sm">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            // ✨ 使用 t('search_placeholder')
+            placeholder={t('search_placeholder')}
+            className="flex h-10 w-full rounded-full border border-input bg-background pl-10 pr-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          {searchQuery && (
+            <X 
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground"
+              onClick={() => setSearchQuery('')}
+            />
+          )}
+        </div>
+
+        {/* 2. ✨ 分類按鈕：佔據右側，修正電腦版顯示怪的問題 */}
+        <div className="flex w-full items-center gap-2 overflow-x-auto pb-2 scrollbar-hide md:overflow-visible md:pb-0 md:justify-end md:flex-wrap">
+          {categories.map((category) => (
+            <Button
+              key={category}
+              variant={selectedCategory === category ? 'default' : 'secondary'}
+              // whitespace-nowrap 讓手機版能滑動，在 md: 下會自動換行
+              className="rounded-full flex-shrink-0 whitespace-nowrap px-4 py-1 h-8 text-xs md:text-sm"
+              onClick={() => setSelectedCategory(category)}
+            >
+              {/* ✨ 使用 t('all_categories') 翻譯 "All" 按鈕 */}
+              {category === 'All' ? t('all_categories') : category}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* ▼✨ 招式網格渲染區域 ▼ */}
+      {/* 總資料庫為空（未登入或無公開招式） */}
+      {tricks.length === 0 && (
+        <EmptyState t={t} title={t('no_tricks')} desc={t('be_first')} showPlay />
+      )}
+
+      {/* 總資料庫有資料，但篩選結果為空 */}
+      {tricks.length > 0 && filteredTricks.length === 0 && (
+        <EmptyState 
+          t={t} 
+          // ✨ 根據是由「分類」還是「搜尋」導致的空結果顯示不同文字
+          title={searchQuery.trim() ? t('no_tricks_found') : t('no_tricks_in_category')} 
+        />
+      )}
+
+      {/* 有篩選結果，正常渲染 */}
+      {filteredTricks.length > 0 && (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredTricks.map((trick) => (
+            <TrickCard 
+              key={trick.id} 
+              trick={trick} 
+              currentUser={currentUser} 
+              onUpdate={handleTrickUpdated} 
+              t={t}
+            />      
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 抽離出來的簡單 EmptyState 元件，同樣使用傳入的 t 翻譯
+function EmptyState({ t, title, desc, showPlay }: any) {
+  return (
+    <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/25 bg-muted/10 py-24 px-6 text-center animate-in fade-in">
+      {showPlay && (
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Play className="h-8 w-8 ml-1 opacity-80" />
+        </div>
+      )}
+      <p className="text-lg font-semibold text-foreground mb-1">{title}</p>
+      {desc && <p className="text-sm text-muted-foreground">{desc}</p>}
     </div>
   )
 }
