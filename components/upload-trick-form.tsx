@@ -1,6 +1,6 @@
 'use client'
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2, Film, Server } from 'lucide-react';

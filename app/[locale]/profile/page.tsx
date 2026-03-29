@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/supabase";
 import { User } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import AuthGuard from "@/components/auth-guard";

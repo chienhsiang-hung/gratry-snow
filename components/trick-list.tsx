@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/supabase'
 import { Lock, Globe, Play, Loader2, Calendar, X, Edit } from 'lucide-react'
 import { TrickPlayer } from './trick-player'
 import { useTranslations } from "next-intl"
@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 type Trick = {
   id: string
@@ -25,42 +27,37 @@ type Trick = {
   description: string | null
 }
 
-export function TrickList() {
-  const [tricks, setTricks] = useState<Trick[]>([])
-  const [loading, setLoading] = useState(true)
+export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
+  // 將預設值設為 Server 傳來的資料，這樣一開始 loading 就是 false
+  const [tricks, setTricks] = useState<Trick[]>(initialTricks)
+  const [loading, setLoading] = useState(false) // 預設不再需要 loading
   const [currentUser, setCurrentUser] = useState<any>(null)
   const t = useTranslations()
+  const router = useRouter()
 
+  // 3. ✨ 新增這個 useEffect：當 Server 因為 router.refresh() 傳來新資料時，同步更新畫面
   useEffect(() => {
-    async function fetchTricks() {
-      // 1. 先取得當前登入的使用者
-      const { data: { user } } = await supabase.auth.getUser()
-      setCurrentUser(user)
+    setTricks(initialTricks)
+  }, [initialTricks])
 
-      // 2. 取得招式列表
-      const { data, error } = await supabase
-        .from('tricks')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('取得招式失敗:', error)
-      } else {
-        setTricks(data || [])
-      }
-      setLoading(false)
-    }
-
-    fetchTricks()
-
-    // 2. 監聽登入/登出事件，一有變動就重新抓取資料更新畫面
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+  // 4. ✨ 完善 Auth 監聽機制
+  useEffect(() => {
+    // 初始化時先設定一次當前的 User
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setCurrentUser(session?.user || null)
-      fetchTricks() 
     })
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user || null)
+      
+      // 當使用者「登入」或「登出」時，通知 Next.js 背景重新執行 Server Component (包含抓取最新權限的資料)
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        router.refresh()
+      }
+    })
+    
     return () => subscription.unsubscribe()
-  }, [])
+  }, [router])
 
   const handleTrickUpdated = (updatedTrick: Trick) => {
     setTricks((prev) => 
@@ -150,10 +147,27 @@ function TrickCard({
 
   const isOwner = currentUser?.id === trick.user_id
 
+  // 修改：主表單的樂觀更新
   const handleSave = async () => {
     if (!editForm.name.trim()) return
 
-    setIsSaving(true)
+    // 1. 備份舊資料 (若失敗需要還原)
+    const previousTrick = { ...trick }
+
+    // 2. 建立預期的更新後資料
+    const optimisticTrick = {
+      ...trick,
+      name: editForm.name,
+      category: editForm.category,
+      description: editForm.description,
+      privacy: editForm.privacy,
+    }
+
+    // 3. ✨ 樂觀更新：不等 API，立刻更新父層 UI 並關閉彈窗！
+    onUpdate(optimisticTrick)
+    setIsEditing(false) 
+
+    // 4. 背景默默發送 API 給 Supabase
     const { data, error } = await supabase
       .from('tricks')
       .update({
@@ -166,19 +180,34 @@ function TrickCard({
       .select()
       .single()
   
+    // 5. 如果 API 報錯，退回舊資料並提示使用者
     if (error) {
       console.error('更新失敗:', error)
-      alert('更新失敗，請稍後再試')
+      onUpdate(previousTrick) // 😭 畫面退回原本狀態
+      alert('更新失敗，已還原資料，請稍後再試') // 建議之後可換成 Sonner Toast
     } else if (data) {
-      onUpdate(data) // 通知父元件更新列表
-      setIsEditing(false) // 關閉編輯彈窗
+      // (可選) 用伺服器回傳的最終正確資料再更新一次，確保 100% 同步
+      onUpdate(data) 
     }
-    setIsSaving(false)
   }
 
-  // ▼▼▼ 新增：專門儲存劇院模式筆記的 Function ▼▼▼
+  // 修改：劇院模式筆記的樂觀更新
   const handleSaveNote = async () => {
-    setIsSavingNote(true)
+    // 1. 備份舊資料
+    const previousTrick = { ...trick }
+
+    // 2. 預期的更新後資料
+    const optimisticTrick = {
+      ...trick,
+      description: tempNote
+    }
+
+    // 3. ✨ 樂觀更新：立刻更新 UI，關閉編輯模式，同步本地表單
+    onUpdate(optimisticTrick)
+    setIsEditingNote(false)
+    setEditForm(prev => ({ ...prev, description: tempNote }))
+
+    // 4. 背景發送 API
     const { data, error } = await supabase
       .from('tricks')
       .update({ description: tempNote })
@@ -186,16 +215,16 @@ function TrickCard({
       .select()
       .single()
 
+    // 5. 錯誤還原機制
     if (error) {
       console.error('更新筆記失敗:', error)
+      onUpdate(previousTrick) // 退回舊資料
+      setTempNote(previousTrick.description || '') // 筆記欄位也退回
+      setEditForm(prev => ({ ...prev, description: previousTrick.description || '' }))
       alert(t('update_failed'))
     } else if (data) {
       onUpdate(data) 
-      setIsEditingNote(false)
-      // 同步更新主表單的內容，確保兩邊資料一致
-      setEditForm(prev => ({ ...prev, description: tempNote }))
     }
-    setIsSavingNote(false)
   }
   
   // 當開啟劇院模式時，禁止背景滾動 (優化手機體驗)
@@ -214,10 +243,12 @@ function TrickCard({
       <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/30 animate-in fade-in zoom-in-95">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
-            <img 
+            <Image 
               src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
               alt={trick.name}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill // 取代 h-full w-full object-cover
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/30">
               <div className="rounded-full bg-background/90 p-4 text-foreground shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110">

@@ -1,36 +1,58 @@
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { TrickList } from "@/components/trick-list";
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/supabase'
+import { Loader2 } from "lucide-react";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export default async function Home({
-  params
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params;
-  if (!routing.locales.includes(locale as any)) {
-    notFound();
+async function TrickListServer() {
+  // 注意這裡不用 await createClient()，直接呼叫即可
+  const supabase = await createClient(); 
+
+  // 1. (可選) 檢查目前登入的使用者
+  const { data: { user } } = await supabase.auth.getUser();
+  console.log("Server 端讀取到的 User:", user?.id); // 如果印出 null，代表你的 cookie 沒帶過去或沒登入
+
+  // 2. 抓取招式列表 (現在這會帶有登入者的權限了)
+  const { data: initialTricks, error } = await supabase
+    .from('tricks')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Server 抓取資料失敗:', error);
   }
+
+  // 將抓到的資料傳給 Client Component
+  return <TrickList initialTricks={initialTricks || []} />;
+}
+
+// 這是骨架屏 (載入中畫面)，在 Server 抓資料時會先顯示這個
+function TrickListSkeleton() {
+  return (
+    <div className="flex justify-center items-center py-32">
+      <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+    </div>
+  );
+}
+
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations({ locale });
 
   return (
-    // 加上 relative 與 overflow-hidden 以容納背景光暈
     <main className="relative flex flex-1 flex-col items-center w-full px-4 pt-16 pb-12 md:px-8 md:pt-24 gap-12 overflow-hidden">
-      
-      {/* 背景裝飾光暈 */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] opacity-20 pointer-events-none blur-[100px] bg-primary/40 rounded-full"></div>
-
-      {/* Hero 區塊：加上 animate-in 與 slide-in 動畫 */}
+      {/* 這些靜態內容會「瞬間」渲染給使用者看 */}
       <div className="relative z-10 flex flex-col items-center text-center space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out">
-        {/* 標題改用漸層文字 */}
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-foreground to-foreground/70">
           Gratry Snow
         </h1>
@@ -40,7 +62,10 @@ export default async function Home({
       </div>
 
       <div className="w-full">
-        <TrickList />
+        {/* 用 Suspense 包起來，抓資料時顯示 Skeleton，抓完自動替換成 TrickList */}
+        <Suspense fallback={<TrickListSkeleton />}>
+          <TrickListServer />
+        </Suspense>
       </div>
     </main>
   );
