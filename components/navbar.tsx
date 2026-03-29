@@ -146,6 +146,18 @@ export default function Navbar() {
 
         {/* 右側工具欄 */}
         <div className="flex items-center gap-2 sm:gap-3">
+          
+          {/* 新增：手機版專屬的直接上傳按鈕 (只在 md 以下尺寸顯示) */}
+          <Link href="/upload" className="md:hidden flex items-center" aria-label={t('upload_trick') || "Upload"}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full text-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
+            >
+              <Upload className="h-5 w-5 transition-transform hover:scale-110" />
+            </Button>
+          </Link>
+
           <div className="hidden md:flex items-center">
             <a 
               href="https://github.com/chienhsiang-hung/gratry-snow" 
