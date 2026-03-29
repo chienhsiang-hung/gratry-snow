@@ -35,14 +35,12 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
   const t = useTranslations()
   const router = useRouter()
 
-  // 3. ✨ 新增這個 useEffect：當 Server 因為 router.refresh() 傳來新資料時，同步更新畫面
   useEffect(() => {
     setTricks(initialTricks)
+    setLoading(false) 
   }, [initialTricks])
 
-  // 4. ✨ 完善 Auth 監聽機制
   useEffect(() => {
-    // 初始化時先設定一次當前的 User
     supabase.auth.getSession().then(({ data: { session } }) => {
       setCurrentUser(session?.user || null)
     })
@@ -50,8 +48,8 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setCurrentUser(session?.user || null)
       
-      // 當使用者「登入」或「登出」時，通知 Next.js 背景重新執行 Server Component (包含抓取最新權限的資料)
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        setLoading(true) // 🔥 觸發重新抓取前，先強制顯示你原本寫好的 Skeleton
         router.refresh()
       }
     })
