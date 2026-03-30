@@ -4,8 +4,7 @@ import { TrickList } from "@/components/tricks/trick-list";
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { supabase } from '@/lib/supabase/supabase'
-import { Loader2 } from "lucide-react";
+import { TrickSkeleton } from "@/components/tricks/trick-skeleton";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -34,11 +33,10 @@ async function TrickListServer() {
   return <TrickList initialTricks={initialTricks || []} />;
 }
 
-// 這是骨架屏 (載入中畫面)，在 Server 抓資料時會先顯示這個
 function TrickListSkeleton() {
   return (
-    <div className="flex justify-center items-center py-32">
-      <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+    <div className="w-full pt-8">
+      <TrickSkeleton count={8} />
     </div>
   );
 }
