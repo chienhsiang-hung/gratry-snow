@@ -165,6 +165,11 @@ const translations = {
   status: { en: 'Status', zh: '狀態' },
   active: { en: 'Active', zh: '活躍' },
   provider: { en: 'Provider', zh: '登入方式' },
+
+  share: { en: 'Share', zh: '分享' },
+  copied: { en: 'Copied!', zh: '已複製！' },
+  share_link_copied: { en: 'Share link copied to clipboard!', zh: '專屬分享連結已複製到剪貼簿！' },
+  share_error: { en: 'Failed to generate share link. Please try again.', zh: '產生分享連結失敗，請稍後再試。' },
 };
 
 export type Locale = 'en' | 'zh';
