@@ -16,6 +16,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TrickSkeleton } from './trick-skeleton';
+import { ShareButton } from "@/components/tricks/share-button";
 
 type Trick = {
   id: string
@@ -26,6 +27,7 @@ type Trick = {
   name: string
   privacy: 'public' | 'private'
   description: string | null
+  share_id: string | null
 }
 
 export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
@@ -338,15 +340,22 @@ function TrickCard({
 
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
-              {isOwner && (
+            {isOwner && (
+              /* 這裡加了一個 div 當作唯一的父元素，並使用 flex 讓兩個按鈕水平排列 */
+              <div className="flex items-center gap-2">
+                <ShareButton 
+                  trickId={trick.id} 
+                  initialShareId={trick.share_id} 
+                />
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="mt-1 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                   title="修改招式"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-              )}
+              </div>
+            )}
             </div>
             {trick.description && (
               <p className="mt-2 line-clamp-2 text-sm text-muted-foreground whitespace-pre-wrap">
