@@ -12,6 +12,10 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    cpus: 1, 
+    memoryBasedWorkersCount: true,
+  },
 };
 
 export default withNextIntl(nextConfig);
