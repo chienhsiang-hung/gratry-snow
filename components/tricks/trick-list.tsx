@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/supabase'
-import { Lock, Globe, Play, Loader2, Calendar, X, Edit, Search } from 'lucide-react'
+import { Lock, Globe, Play, Loader2, Calendar, X, Edit, Search, Share2 } from 'lucide-react'
+import { toast } from "sonner"
 import { TrickPlayer } from './trick-player'
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -16,6 +17,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TrickSkeleton } from './trick-skeleton';
+import { generateShareLink } from '@/app/actions/share-trick'
 
 type Trick = {
   id: string
@@ -26,6 +28,7 @@ type Trick = {
   name: string
   privacy: 'public' | 'private'
   description: string | null
+  share_id?: string | null
 }
 
 export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
@@ -189,9 +192,12 @@ function TrickCard({
 }: {
   trick: Trick; currentUser: any; onUpdate: (trick: Trick) => void; t: any
 }) {
+  const locale = useLocale()
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
 
   // ▼▼▼ 新增：專門給劇院模式快速編輯筆記用的 State ▼▼▼
   const [isEditingNote, setIsEditingNote] = useState(false)
@@ -206,6 +212,34 @@ function TrickCard({
   })
 
   const isOwner = currentUser?.id === trick.user_id
+
+  // ✨ 新增：處理分享與複製連結的邏輯
+  const handleShare = async () => {
+    let currentShareId = trick.share_id;
+
+    // 如果這個招式還沒有分享過，呼叫 API 產生一組
+    if (!currentShareId) {
+      setIsSharing(true)
+      const res = await generateShareLink(trick.id)
+      setIsSharing(false)
+
+      if (res.success && res.trick) {
+        currentShareId = res.trick.share_id
+        onUpdate(res.trick) // 同步更新父層狀態，這樣下次點就不會再戳 API
+      } else {
+        toast.error(t('share_failed', { fallback: '產生分享連結失敗，請稍後再試' }))
+        return
+      }
+    }
+
+    // 組合完整的分享網址並複製到剪貼簿
+    const shareUrl = `${window.location.origin}/${locale}/share/${currentShareId}`
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast.success(t('link_copied', { fallback: '🔗 已複製專屬分享連結！' }))
+    }).catch(() => {
+      toast.error(t('copy_failed', { fallback: '複製失敗，請手動複製' }))
+    })
+  }
 
   // 修改：主表單的樂觀更新
   const handleSave = async () => {
@@ -339,13 +373,23 @@ function TrickCard({
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
               {isOwner && (
+                <div className="flex items-center gap-1">
+                <button 
+                  onClick={handleShare}
+                  disabled={isSharing}
+                  className="mt-1 rounded-md p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  title={t('share_trick', { fallback: '分享招式' })}
+                >
+                  {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+                </button>
                 <button 
                   onClick={() => setIsEditing(true)}
                   className="mt-1 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="修改招式"
+                  title={t('edit_trick', { fallback: '修改招式' })}
                 >
                   <Edit className="h-4 w-4" />
                 </button>
+              </div>
               )}
             </div>
             {trick.description && (
