@@ -12,22 +12,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
-        success: (
-          <CircleCheckIcon className="size-4" />
-        ),
-        info: (
-          <InfoIcon className="size-4" />
-        ),
-        warning: (
-          <TriangleAlertIcon className="size-4" />
-        ),
-        error: (
-          <OctagonXIcon className="size-4" />
-        ),
-        loading: (
-          <Loader2Icon className="size-4 animate-spin" />
-        ),
+        success: <CircleCheckIcon className="size-4" />,
+        info: <InfoIcon className="size-4" />,
+        warning: <TriangleAlertIcon className="size-4" />,
+        error: <OctagonXIcon className="size-4" />,
+        loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
+      // 這裡的 style 變數也可以留著當備用，不過 Tailwind class 會優先套用
       style={
         {
           "--normal-bg": "var(--popover)",
@@ -38,7 +29,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          // 加上背景、文字顏色、邊框與明顯的陰影
+          toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg rounded-xl border p-4",
+          // 讓次要說明文字變淡一點
+          description: "group-[.toast]:text-muted-foreground",
+          // 把你的「重新登入」Action 按鈕加上主色背景，讓它看起來像個按鈕
+          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground font-medium px-4 py-2 rounded-md hover:opacity-90 transition-opacity",
+          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
       }}
       {...props}
