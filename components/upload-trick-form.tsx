@@ -3,7 +3,7 @@
 import { supabase } from '@/lib/supabase/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2, Film, Server } from 'lucide-react';
+import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2, Film, Server, Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { toast } from 'sonner';
@@ -172,7 +172,34 @@ export function UploadTrickForm() {
 
     } catch (error: any) {
       console.error(error);
-      toast.error(`發生錯誤: ${error.message}`);
+      
+      // 簡單判斷是否為 Token 過期或權限錯誤
+      const errMsg = error.message?.toLowerCase() || '';
+      const isAuthError = errMsg.includes('auth') || errMsg.includes('401') || errMsg.includes('unauthorized') || errMsg.includes('login required');
+
+      if (isAuthError) {
+        toast.error(t('auth_expired'), {
+          description: t('auth_expired_desc'),
+          duration: 10000, // 給使用者多點時間點擊
+          action: {
+            label: t('relogin'),
+            onClick: async () => {
+              // 點擊後重新觸發 Google OAuth 登入
+              await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                  scopes: 'https://www.googleapis.com/auth/youtube.upload',
+                  // 使用 window.location.href 可以保留當前的語系路徑 (例如 /zh/upload)
+                  redirectTo: window.location.href 
+                }
+              });
+            },
+          },
+        });
+      } else {
+        toast.error(`發生錯誤: ${error.message}`);
+      }
+      
       setUploadStep('idle');
     }
   };
@@ -224,13 +251,39 @@ export function UploadTrickForm() {
   }
 
   // ==========================================
-  // 畫面 B：上傳處理中的進度 UI (替換掉整個表單)
+  // 畫面 B：上傳處理中的進度 UI
   // ==========================================
   if (uploadStep !== 'idle') {
+    // 計算總體進度 (0-100%)
+    let overallProgress = 0;
+    if (uploadStep === 'processing') {
+      overallProgress = processProgress * 0.3; // 轉檔佔 30%
+    } else if (uploadStep === 'uploading') {
+      overallProgress = 30 + (uploadProgress * 0.6); // 上傳 YT 佔 60%
+    } else if (uploadStep === 'saving') {
+      overallProgress = 95; // 寫入資料庫給個 95% 假進度，直到變為 success
+    }
+
+    // 依據步驟切換頂部 Icon
+    const CurrentIcon = () => {
+      switch (uploadStep) {
+        case 'processing': return <Film className="h-6 w-6 animate-pulse text-primary" />;
+        case 'uploading': return <UploadCloud className="h-6 w-6 animate-bounce text-primary" />;
+        case 'saving': return <Server className="h-6 w-6 animate-pulse text-primary" />;
+        default: return <Film className="h-6 w-6 text-primary" />;
+      }
+    };
+
     return (
-      <div className="w-full max-w-2xl rounded-xl border bg-card p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] animate-in fade-in zoom-in-95 duration-300">
+      <div className="w-full max-w-2xl rounded-xl border bg-card p-6 sm:p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] animate-in fade-in zoom-in-95 duration-300">
         <div className="w-full max-w-md space-y-8">
+          
           <div className="text-center space-y-2">
+            <div className="flex justify-center mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <CurrentIcon />
+              </div>
+            </div>
             <h2 className="text-2xl font-bold tracking-tight">
               {uploadStep === 'processing' && t('step_processing')}
               {uploadStep === 'uploading' && t('step_uploading')}
@@ -239,54 +292,43 @@ export function UploadTrickForm() {
             <p className="text-sm text-muted-foreground">{t('do_not_close')}</p>
           </div>
 
-          <div className="space-y-6">
-            {/* Step 1: 處理影片 */}
-            <div className={`flex items-center gap-4 ${uploadStep === 'processing' ? 'opacity-100' : 'opacity-40'}`}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                {uploadStep === 'uploading' || uploadStep === 'saving' ? <CheckCircle2 className="h-5 w-5" /> : <Film className={`h-5 w-5 ${uploadStep === 'processing' ? 'animate-pulse' : ''}`} />}
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <div className="flex justify-between text-sm font-medium">
-                  <span>{t('frontend_muting')}</span>
-                  <span>{uploadStep === 'processing' ? `${processProgress}%` : t('completed')}</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full bg-primary transition-all duration-300 ease-out" style={{ width: uploadStep === 'processing' ? `${processProgress}%` : '100%' }} />
-                </div>
-              </div>
+          {/* 整合的單一進度條 */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm font-medium">
+              <span>
+                {uploadStep === 'processing' && t('frontend_muting')}
+                {uploadStep === 'uploading' && t('uploading_to_youtube')}
+                {uploadStep === 'saving' && t('saving_to_library')}
+              </span>
+              <span>{Math.round(overallProgress)}%</span>
             </div>
-
-            {/* Step 2: 上傳影片 */}
-            <div className={`flex items-center gap-4 ${uploadStep === 'uploading' ? 'opacity-100' : uploadStep === 'saving' ? 'opacity-40' : 'opacity-30 grayscale'}`}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                {uploadStep === 'saving' ? <CheckCircle2 className="h-5 w-5" /> : <UploadCloud className={`h-5 w-5 ${uploadStep === 'uploading' ? 'animate-bounce' : ''}`} />}
-              </div>
-              <div className="flex-1 space-y-1.5">
-                <div className="flex justify-between text-sm font-medium">
-                  <span>{t('uploading_to_youtube')}</span>
-                  <span>{uploadStep === 'uploading' ? `${uploadProgress}%` : uploadStep === 'saving' ? t('completed') : ''}</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full bg-primary transition-all duration-300 ease-out" style={{ width: uploadStep === 'uploading' ? `${uploadProgress}%` : uploadStep === 'saving' ? '100%' : '0%' }} />
-                </div>
-              </div>
+            <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+              <div 
+                className="h-full bg-primary transition-all duration-300 ease-out" 
+                style={{ width: `${overallProgress}%` }} 
+              />
             </div>
+          </div>
 
-            {/* Step 3: 寫入資料庫 */}
-            <div className={`flex items-center gap-4 ${uploadStep === 'saving' ? 'opacity-100' : 'opacity-30 grayscale'}`}>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Server className={`h-5 w-5 ${uploadStep === 'saving' ? 'animate-pulse' : ''}`} />
+          {/* 雙語 YouTube 隱私說明區塊 */}
+          <div className="mt-8 rounded-lg bg-muted/50 p-4 border border-muted flex gap-3 items-start">
+            <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">Upload Privacy Notice</p>
+                <p className="text-xs text-muted-foreground">
+                  Your video will be uploaded to your connected YouTube account and set as <span className="font-medium text-foreground">"Unlisted"</span>.
+                </p>
               </div>
-              <div className="flex-1 space-y-1.5">
-                <div className="flex justify-between text-sm font-medium">
-                  <span>{t('saving_to_library')}</span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-                  <div className={`h-full bg-primary transition-all duration-500 ease-out ${uploadStep === 'saving' ? 'w-full' : 'w-0'}`} />
-                </div>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-foreground">上傳隱私說明</p>
+                <p className="text-xs text-muted-foreground">
+                  您的影片將會上傳至您綁定的 YouTube 帳號，並設定為<span className="font-medium text-foreground">「不公開 (Unlisted)」</span>。
+                </p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     );
