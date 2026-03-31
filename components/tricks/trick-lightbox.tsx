@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl"
 import { supabase } from '@/lib/supabase/supabase'
 import { TrickPlayer } from './trick-player'
 import type { Trick } from './trick-list'
+import { toast } from 'sonner'
 
 export function TrickLightbox({ trick, isOwner, onClose, onUpdate }: { trick: Trick; isOwner: boolean; onClose: () => void; onUpdate: (trick: Trick) => void }) {
   const [isEditingNote, setIsEditingNote] = useState(false)
@@ -39,7 +40,11 @@ export function TrickLightbox({ trick, isOwner, onClose, onUpdate }: { trick: Tr
       console.error('更新筆記失敗:', error)
       onUpdate(previousTrick)
       setTempNote(previousTrick.description || '')
-      alert(t('update_failed'))
+      // 🛑 把 alert 換成 toast.error
+      toast.error(t('update_failed'))
+    } else {
+      // ✅ 加上成功的 toast
+      toast.success(t('update_success'))
     }
   }
 

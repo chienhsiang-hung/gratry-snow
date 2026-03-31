@@ -215,6 +215,10 @@ const translations = {
     en: 'Update failed, data restored. Please try again later.',
     zh: '更新失敗，已還原資料，請稍後再試。'
   },
+  update_success: {
+    en: 'Update successful!',
+    zh: '更新成功！'
+  },
   uploaded_by: { en: 'Uploaded by', zh: '上傳者' },
 
   // --- Player ---

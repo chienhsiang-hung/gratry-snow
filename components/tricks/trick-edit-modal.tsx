@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTranslations } from "next-intl"
 import { supabase } from '@/lib/supabase/supabase'
 import type { Trick } from './trick-list'
+import { toast } from 'sonner'
 
 export function TrickEditModal({ trick, onClose, onUpdate }: { trick: Trick; onClose: () => void; onUpdate: (trick: Trick) => void }) {
   const [isSaving, setIsSaving] = useState(false)
@@ -39,7 +40,7 @@ export function TrickEditModal({ trick, onClose, onUpdate }: { trick: Trick; onC
 
     setIsSaving(true)
     onUpdate(optimisticTrick)
-    onClose() // 立刻關閉 Modal，體驗更順暢
+    onClose() // 立刻關閉 Modal
 
     const { error } = await supabase
       .from('tricks')
@@ -56,7 +57,11 @@ export function TrickEditModal({ trick, onClose, onUpdate }: { trick: Trick; onC
     if (error) {
       console.error('更新失敗:', error)
       onUpdate(previousTrick) 
-      alert(t('update_failed_restore'))
+      // 🛑 把 alert 換成 toast.error
+      toast.error(t('update_failed_restore'))
+    } else {
+      // ✅ 加上成功的 toast
+      toast.success(t('update_success'))
     }
   }
 
