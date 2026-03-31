@@ -28,6 +28,13 @@ type Trick = {
   privacy: 'public' | 'private'
   description: string | null
   share_id: string | null
+  profiles?: {
+    username: string;
+    avatar_url: string;
+    ig_handle: string | null;
+    ig_name: string | null;
+    ig_avatar_url: string | null;
+  }
 }
 
 export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
