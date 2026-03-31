@@ -74,6 +74,7 @@ export default async function TrickSharePage({
   params: Promise<{ locale: string; share_id: string }> 
 }) {
   const { locale, share_id } = await params;
+  const t = await getTranslations({ locale });
   
   if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
@@ -109,7 +110,7 @@ export default async function TrickSharePage({
 
       {/* 提示：這是一個私人分享連結 */}
       <div className="mt-8 text-center text-sm text-muted-foreground bg-primary/10 py-3 rounded-xl">
-        <p>This is a private link shared with you. 🏂</p>
+        <p>{t('private_share_notice')}</p>
       </div>
 
     </main>

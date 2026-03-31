@@ -47,7 +47,7 @@ export function ShareButton({ trickId, initialShareId }: ShareButtonProps) {
       if (navigator.share && /mobile|android|iphone/i.test(navigator.userAgent.toLowerCase())) {
         try {
           await navigator.share({
-            title: 'Check out my trick! | Gratry Snow',
+            title: t('share_native_title'),
           url: shareUrl
         });
         // 原生分享成功就不特別顯示 toast，因為系統 UI 已經回饋了
