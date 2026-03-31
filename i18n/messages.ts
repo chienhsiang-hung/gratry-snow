@@ -170,6 +170,34 @@ const translations = {
   copied: { en: 'Copied!', zh: '已複製！' },
   share_link_copied: { en: 'Share link copied to clipboard!', zh: '專屬分享連結已複製到剪貼簿！' },
   share_error: { en: 'Failed to generate share link. Please try again.', zh: '產生分享連結失敗，請稍後再試。' },
+
+  // === Trick List 補充 ===
+  director_notes: { 
+    en: "Notes", 
+    zh: '筆記' 
+  },
+  update_failed_restore: { 
+    en: 'Update failed, data restored. Please try again later.', 
+    zh: '更新失敗，已還原資料，請稍後再試。' 
+  },
+  // === Share Button 補充 ===
+  share_native_title: { 
+    en: 'Check out my trick! | Gratry Snow', 
+    zh: '看看我的滑雪新招！ | Gratry Snow' 
+  },
+  // === Share Page (被分享的頁面) 補充 ===
+  not_found_title: { 
+    en: 'Page Not Found | Gratry Snow', 
+    zh: '找不到頁面 | Gratry Snow' 
+  },
+  default_trick_name: { 
+    en: 'Untitled Trick', 
+    zh: '未命名招式' 
+  },
+  private_share_notice: { 
+    en: 'This is a private link shared with you. 🏂', 
+    zh: '這是一個專屬的私人分享連結 🏂' 
+  },
 };
 
 export type Locale = 'en' | 'zh';

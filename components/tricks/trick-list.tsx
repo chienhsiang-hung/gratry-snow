@@ -246,7 +246,7 @@ function TrickCard({
     if (error) {
       console.error('更新失敗:', error)
       onUpdate(previousTrick) // 😭 畫面退回原本狀態
-      alert('更新失敗，已還原資料，請稍後再試') // 建議之後可換成 Sonner Toast
+      alert(t('update_failed_restore')) // 建議之後可換成 Sonner Toast
     } else if (data) {
       // (可選) 用伺服器回傳的最終正確資料再更新一次，確保 100% 同步
       onUpdate(data) 
@@ -308,7 +308,7 @@ function TrickCard({
             <Image 
               src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
               alt={trick.name}
-              fill // 取代 h-full w-full object-cover
+              fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
@@ -341,7 +341,6 @@ function TrickCard({
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
             {isOwner && (
-              /* 這裡加了一個 div 當作唯一的父元素，並使用 flex 讓兩個按鈕水平排列 */
               <div className="flex items-center gap-2">
                 <ShareButton 
                   trickId={trick.id} 
@@ -350,7 +349,7 @@ function TrickCard({
                 <button 
                   onClick={() => setIsEditing(true)}
                   className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="修改招式"
+                  title={t('edit_tooltip')}
                 >
                   <Edit className="h-4 w-4" />
                 </button>
@@ -442,7 +441,7 @@ function TrickCard({
 
                     {trick.description ? (
                       <div>
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">Director's Notes</h4>
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">{t('director_notes')}</h4>
                         <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed pr-8 font-light">
                           {trick.description}
                         </p>
