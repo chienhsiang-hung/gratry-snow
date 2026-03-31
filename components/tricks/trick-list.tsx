@@ -223,14 +223,13 @@ function TrickCard({
 
   const isOwner = currentUser?.id === trick.user_id
 
-  // 修改：主表單的樂觀更新
   const handleSave = async () => {
     if (!editForm.name.trim()) return
 
-    // 1. 備份舊資料 (若失敗需要還原)
+    // 1. 備份舊資料
     const previousTrick = { ...trick }
 
-    // 2. 建立預期的更新後資料
+    // 2. 建立預期的更新後資料 (注意這裡我們只改變需要改變的欄位，保留原本的 profiles 等其他關聯資料)
     const optimisticTrick = {
       ...trick,
       name: editForm.name,
@@ -239,12 +238,13 @@ function TrickCard({
       privacy: editForm.privacy,
     }
 
-    // 3. ✨ 樂觀更新：不等 API，立刻更新父層 UI 並關閉彈窗！
+    // 3. 樂觀更新UI並關閉彈窗
+    setIsSaving(true) // 加入儲存狀態防呆
     onUpdate(optimisticTrick)
     setIsEditing(false) 
 
-    // 4. 背景默默發送 API 給 Supabase
-    const { data, error } = await supabase
+    // 4. 背景發送 API
+    const { error } = await supabase
       .from('tricks')
       .update({
         name: editForm.name,
@@ -253,53 +253,51 @@ function TrickCard({
         privacy: editForm.privacy,
       })
       .eq('id', trick.id)
-      .select()
-      .single()
   
-    // 5. 如果 API 報錯，退回舊資料並提示使用者
+    setIsSaving(false)
+
+    // 5. 錯誤處理 (API 不回傳 select()，因為我們不想覆蓋掉 profiles 關聯資料)
     if (error) {
       console.error('更新失敗:', error)
-      onUpdate(previousTrick) // 😭 畫面退回原本狀態
-      alert(t('update_failed_restore')) // 建議之後可換成 Sonner Toast
-    } else if (data) {
-      // (可選) 用伺服器回傳的最終正確資料再更新一次，確保 100% 同步
-      onUpdate(data) 
+      onUpdate(previousTrick) 
+      alert(t('update_failed_restore'))
+      // 復原表單
+      setEditForm({
+        name: previousTrick.name,
+        category: previousTrick.category,
+        description: previousTrick.description || '',
+        privacy: previousTrick.privacy,
+      })
     }
   }
 
-  // 修改：劇院模式筆記的樂觀更新
   const handleSaveNote = async () => {
-    // 1. 備份舊資料
     const previousTrick = { ...trick }
-
-    // 2. 預期的更新後資料
+    
+    // 只更新 description，保留其他所有欄位 (包含 profiles)
     const optimisticTrick = {
       ...trick,
       description: tempNote
     }
 
-    // 3. ✨ 樂觀更新：立刻更新 UI，關閉編輯模式，同步本地表單
+    setIsSavingNote(true)
     onUpdate(optimisticTrick)
     setIsEditingNote(false)
     setEditForm(prev => ({ ...prev, description: tempNote }))
 
-    // 4. 背景發送 API
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('tricks')
       .update({ description: tempNote })
       .eq('id', trick.id)
-      .select()
-      .single()
 
-    // 5. 錯誤還原機制
+    setIsSavingNote(false)
+
     if (error) {
       console.error('更新筆記失敗:', error)
-      onUpdate(previousTrick) // 退回舊資料
-      setTempNote(previousTrick.description || '') // 筆記欄位也退回
+      onUpdate(previousTrick)
+      setTempNote(previousTrick.description || '')
       setEditForm(prev => ({ ...prev, description: previousTrick.description || '' }))
       alert(t('update_failed'))
-    } else if (data) {
-      onUpdate(data) 
     }
   }
   
