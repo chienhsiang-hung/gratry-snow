@@ -58,16 +58,23 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
   }, [initialTricks])
 
   useEffect(() => {
+    let currentUserId: string | undefined = undefined;
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user || null)
+      currentUserId = session?.user?.id;
+      setCurrentUser(session?.user || null);
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const newUserId = session?.user?.id;
       setCurrentUser(session?.user || null)
       
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        setLoading(true) // 🔥 觸發重新抓取前，先強制顯示你原本寫好的 Skeleton
-        router.refresh()
+        if (currentUserId !== newUserId) {
+          currentUserId = newUserId;
+          setLoading(true);
+          router.refresh();
+        }
       }
     })
     
