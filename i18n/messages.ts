@@ -131,6 +131,7 @@ const translations = {
   },
 
   // === TrickList ===
+  tricks: { en: 'Tricks', zh: '收藏招式'},
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
   be_first: { en: 'Click "Add Trick" at the top right to be the first to upload!', zh: '趕快點擊右上角的新增招式，成為第一個上傳的人吧！' },
