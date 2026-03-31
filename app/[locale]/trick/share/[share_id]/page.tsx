@@ -1,9 +1,10 @@
+import { cache } from 'react';
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { createClient } from '@supabase/supabase-js';
 import type { Metadata } from "next";
-import { TrickPlayer } from "@/components/tricks/trick-player"; // 確保路徑正確
+import { TrickPlayer } from "@/components/tricks/trick-player";
 
 // ⚠️ 重要：建立一個 Admin Client 來繞過 RLS。
 // 只有在 Server Component 裡才可以這樣做，避免私有資料被 RLS 擋下。
@@ -11,6 +12,14 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+const getTrickByShareId = cache(async (share_id: string) => {
+  return await supabaseAdmin
+    .from('tricks')
+    .select('*')
+    .eq('share_id', share_id)
+    .single();
+});
 
 export async function generateMetadata({ 
   params 
@@ -21,11 +30,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale });
   
   // 透過 share_id 抓取影片資訊 (無權限阻礙)
-  const { data: trick } = await supabaseAdmin
-    .from('tricks')
-    .select('name, description, video_id')
-    .eq('share_id', share_id)
-    .single();
+  const { data: trick } = await getTrickByShareId(share_id);
 
   if (!trick) {
     return { title: t('not_found_title') || 'Not Found' };
@@ -73,12 +78,7 @@ export default async function TrickSharePage({
   if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
-  // 抓取 Trick 完整資料
-  const { data: trick, error } = await supabaseAdmin
-    .from('tricks')
-    .select('*')
-    .eq('share_id', share_id)
-    .single();
+  const { data: trick, error } = await getTrickByShareId(share_id);
 
   // 如果找不到這個 share_id 或是發生錯誤，直接 404
   if (error || !trick) {
