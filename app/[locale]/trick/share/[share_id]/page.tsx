@@ -111,7 +111,7 @@ export default async function TrickSharePage({
             )}
           </div>
           <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground leading-tight">Uploaded by</span>
+            <span className="text-xs text-muted-foreground leading-tight">{t('uploaded_by')}</span>
             <span className="text-sm font-semibold group-hover:text-primary transition-colors leading-tight mt-0.5">
               {uploaderName}
             </span>
