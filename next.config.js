@@ -16,6 +16,9 @@ const nextConfig = {
     cpus: 1, 
     memoryBasedWorkersCount: true,
   },
+  allowedDevOrigins: [
+    '3000-firebase-gratry-snow-1774935121198.cluster-yylgzpipxrar4v4a72liastuqy.cloudworkstations.dev'
+  ],
 };
 
 export default withNextIntl(nextConfig);
