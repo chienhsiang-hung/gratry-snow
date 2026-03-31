@@ -16,6 +16,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TrickSkeleton } from './trick-skeleton';
+import { ShareButton } from "@/components/tricks/share-button";
 
 type Trick = {
   id: string
@@ -26,6 +27,14 @@ type Trick = {
   name: string
   privacy: 'public' | 'private'
   description: string | null
+  share_id: string | null
+  profiles?: {
+    username: string;
+    avatar_url: string;
+    ig_handle: string | null;
+    ig_name: string | null;
+    ig_avatar_url: string | null;
+  }
 }
 
 export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
@@ -56,16 +65,23 @@ export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
   }, [initialTricks])
 
   useEffect(() => {
+    let currentUserId: string | undefined = undefined;
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user || null)
+      currentUserId = session?.user?.id;
+      setCurrentUser(session?.user || null);
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      const newUserId = session?.user?.id;
       setCurrentUser(session?.user || null)
       
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        setLoading(true) // 🔥 觸發重新抓取前，先強制顯示你原本寫好的 Skeleton
-        router.refresh()
+        if (currentUserId !== newUserId) {
+          currentUserId = newUserId;
+          setLoading(true);
+          router.refresh();
+        }
       }
     })
     
@@ -244,7 +260,7 @@ function TrickCard({
     if (error) {
       console.error('更新失敗:', error)
       onUpdate(previousTrick) // 😭 畫面退回原本狀態
-      alert('更新失敗，已還原資料，請稍後再試') // 建議之後可換成 Sonner Toast
+      alert(t('update_failed_restore')) // 建議之後可換成 Sonner Toast
     } else if (data) {
       // (可選) 用伺服器回傳的最終正確資料再更新一次，確保 100% 同步
       onUpdate(data) 
@@ -297,6 +313,11 @@ function TrickCard({
     return () => { document.body.style.overflow = 'unset'; }
   }, [isPlaying, isEditing]);
 
+  const uploaderProfile = trick.profiles;
+  const uploaderAvatar = uploaderProfile?.ig_avatar_url || uploaderProfile?.avatar_url;
+  const uploaderName = uploaderProfile?.ig_name || uploaderProfile?.username || 'Unknown Rider';
+  const uploaderHandle = uploaderProfile?.ig_handle;
+
   return (
     <>
       {/* 這是原本的卡片 (永遠只顯示縮圖與資訊) */}
@@ -306,7 +327,7 @@ function TrickCard({
             <Image 
               src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
               alt={trick.name}
-              fill // 取代 h-full w-full object-cover
+              fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
@@ -326,6 +347,30 @@ function TrickCard({
         </div>
 
         <div className="flex flex-1 flex-col p-5">
+          {/* 新增：Uploader 資訊列 */}
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-8 w-8 overflow-hidden rounded-full border bg-muted">
+              {uploaderAvatar ? (
+                <img src={uploaderAvatar} alt={uploaderName} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs font-bold">
+                {uploaderName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium leading-none">{uploaderName}</span>
+              {uploaderHandle && (
+                <a 
+                  href={`https://instagram.com/${uploaderHandle}`} 
+                  target="_blank" 
+                  className="text-xs text-muted-foreground hover:text-pink-500 transition-colors mt-1"
+                >
+                  @{uploaderHandle}
+                </a>
+              )}
+            </div>
+          </div>
           <div className="mb-3 flex items-center justify-between">
             <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
               {trick.category}
@@ -338,15 +383,21 @@ function TrickCard({
 
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-xl font-bold tracking-tight">{trick.name}</h3>
-              {isOwner && (
+            {isOwner && (
+              <div className="flex items-center gap-2">
+                <ShareButton 
+                  trickId={trick.id} 
+                  initialShareId={trick.share_id} 
+                />
                 <button 
                   onClick={() => setIsEditing(true)}
-                  className="mt-1 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="修改招式"
+                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title={t('edit_tooltip')}
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-              )}
+              </div>
+            )}
             </div>
             {trick.description && (
               <p className="mt-2 line-clamp-2 text-sm text-muted-foreground whitespace-pre-wrap">
@@ -433,7 +484,7 @@ function TrickCard({
 
                     {trick.description ? (
                       <div>
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">Director's Notes</h4>
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">{t('director_notes')}</h4>
                         <p className="text-sm md:text-base text-white/90 whitespace-pre-wrap leading-relaxed pr-8 font-light">
                           {trick.description}
                         </p>

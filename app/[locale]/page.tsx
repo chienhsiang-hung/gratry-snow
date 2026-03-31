@@ -22,7 +22,16 @@ async function TrickListServer() {
   // 2. 抓取招式列表 (現在這會帶有登入者的權限了)
   const { data: initialTricks, error } = await supabase
     .from('tricks')
-    .select('*')
+    .select(`
+      *,
+      profiles (
+        username,
+        avatar_url,
+        ig_handle,
+        ig_name,
+        ig_avatar_url
+      )
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {

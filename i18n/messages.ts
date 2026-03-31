@@ -131,6 +131,7 @@ const translations = {
   },
 
   // === TrickList ===
+  tricks: { en: 'Tricks', zh: '收藏招式'},
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
   be_first: { en: 'Click "Add Trick" at the top right to be the first to upload!', zh: '趕快點擊右上角的新增招式，成為第一個上傳的人吧！' },
@@ -165,6 +166,43 @@ const translations = {
   status: { en: 'Status', zh: '狀態' },
   active: { en: 'Active', zh: '活躍' },
   provider: { en: 'Provider', zh: '登入方式' },
+
+  share: { en: 'Share', zh: '分享' },
+  copied: { en: 'Copied!', zh: '已複製！' },
+  share_link_copied: { en: 'Share link copied to clipboard!', zh: '專屬分享連結已複製到剪貼簿！' },
+  share_error: { en: 'Failed to generate share link. Please try again.', zh: '產生分享連結失敗，請稍後再試。' },
+
+  // === Trick List 補充 ===
+  director_notes: { 
+    en: "Notes", 
+    zh: '筆記' 
+  },
+  update_failed_restore: { 
+    en: 'Update failed, data restored. Please try again later.', 
+    zh: '更新失敗，已還原資料，請稍後再試。' 
+  },
+  // === Share Button 補充 ===
+  share_native_title: { 
+    en: 'Check out my trick! | Gratry Snow', 
+    zh: '看看我的滑雪新招！ | Gratry Snow' 
+  },
+  // === Share Page (被分享的頁面) 補充 ===
+  not_found_title: { 
+    en: 'Page Not Found | Gratry Snow', 
+    zh: '找不到頁面 | Gratry Snow' 
+  },
+  default_trick_name: { 
+    en: 'Untitled Trick', 
+    zh: '未命名招式' 
+  },
+  private_share_notice: { 
+    en: 'This is a private link shared with you. 🏂', 
+    zh: '這是一個專屬的私人分享連結 🏂' 
+  },
+  link_instagram: { en: 'Connect Instagram', zh:'連結 Instagram' },
+  link_instagram_placeholder: { en: 'e.g. hung_chienhsiang', zh: '例如: hung_chienhsiang' },
+
+  uploaded_by: { en: 'Uploaded by', zh: '上傳者' }
 };
 
 export type Locale = 'en' | 'zh';
