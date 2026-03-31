@@ -160,6 +160,14 @@ const translations = {
     en: 'Saving to Library',
     zh: '儲存至招式庫'
   },
+  upload_notice_title: {
+    en: 'Upload Privacy Notice',
+    zh: '上傳隱私說明'
+  },
+  upload_notice_desc: {
+    en: 'Your video will be uploaded to your connected YouTube account and set as "Unlisted".',
+    zh: '您的影片將會上傳至您綁定的 YouTube 帳號，並設定為「不公開 (Unlisted)」。'
+  },
 
   // --- Result ---
   upload_success: {
@@ -206,6 +214,10 @@ const translations = {
   update_failed_restore: {
     en: 'Update failed, data restored. Please try again later.',
     zh: '更新失敗，已還原資料，請稍後再試。'
+  },
+  update_success: {
+    en: 'Update successful!',
+    zh: '更新成功！'
   },
   uploaded_by: { en: 'Uploaded by', zh: '上傳者' },
 
