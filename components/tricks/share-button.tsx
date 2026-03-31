@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Share2, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
-// 這裡請換成你專案中實例化 Supabase Browser Client 的路徑
-// 例如 import { createClient } from '@/lib/supabase/client' 或 supabase.ts
 import { supabase } from '@/lib/supabase/supabase'; 
 
 interface ShareButtonProps {
@@ -16,7 +14,7 @@ interface ShareButtonProps {
 
 export function ShareButton({ trickId, initialShareId }: ShareButtonProps) {
   const t = useTranslations();
-  const locale = useLocale(); // 抓取當前語系，確保分享出去的連結預設是該語系
+  const locale = useLocale();
   
   const [shareId, setShareId] = useState<string | null>(initialShareId || null);
   const [isCopied, setIsCopied] = useState(false);
@@ -37,7 +35,6 @@ export function ShareButton({ trickId, initialShareId }: ShareButtonProps) {
           .eq('id', trickId); // RLS 政策會確保只有擁有者可以 update
 
         if (error) throw error;
-        
         currentShareId = newShareId;
         setShareId(newShareId);
       }
@@ -46,6 +43,20 @@ export function ShareButton({ trickId, initialShareId }: ShareButtonProps) {
       // 例如：https://gratrysnow.com/zh/trick/share/xxxxx-xxxx-xxxx...
       const shareUrl = `${window.location.origin}/${locale}/trick/share/${currentShareId}`;
 
+      // 🚀 優化點：優先嘗試原生分享 (Mobile 體驗極佳)
+      if (navigator.share && /mobile|android|iphone/i.test(navigator.userAgent.toLowerCase())) {
+        try {
+          await navigator.share({
+            title: 'Check out my trick! | Gratry Snow',
+          url: shareUrl
+        });
+        // 原生分享成功就不特別顯示 toast，因為系統 UI 已經回饋了
+        return;
+      } catch (shareError) {
+        // 如果使用者取消分享，或者分享失敗，默默捕捉錯誤即可，不需要中斷
+        console.log('Web share cancelled or failed', shareError);
+      }
+    }
       // 3. 複製到使用者的剪貼簿
       await navigator.clipboard.writeText(shareUrl);
       
