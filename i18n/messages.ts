@@ -160,14 +160,6 @@ const translations = {
     en: 'Saving to Library',
     zh: '儲存至招式庫'
   },
-  upload_notice_title: {
-    en: 'Upload Privacy Notice',
-    zh: '上傳隱私說明'
-  },
-  upload_notice_desc: {
-    en: 'Your video will be uploaded to your connected YouTube account and set as "Unlisted".',
-    zh: '您的影片將會上傳至您綁定的 YouTube 帳號，並設定為「不公開 (Unlisted)」。'
-  },
 
   // --- Result ---
   upload_success: {
