@@ -28,6 +28,13 @@ type Trick = {
   privacy: 'public' | 'private'
   description: string | null
   share_id: string | null
+  profiles?: {
+    username: string;
+    avatar_url: string;
+    ig_handle: string | null;
+    ig_name: string | null;
+    ig_avatar_url: string | null;
+  }
 }
 
 export function TrickList({ initialTricks }: { initialTricks: Trick[] }) {
@@ -306,6 +313,11 @@ function TrickCard({
     return () => { document.body.style.overflow = 'unset'; }
   }, [isPlaying, isEditing]);
 
+  const uploaderProfile = trick.profiles;
+  const uploaderAvatar = uploaderProfile?.ig_avatar_url || uploaderProfile?.avatar_url;
+  const uploaderName = uploaderProfile?.ig_name || uploaderProfile?.username || 'Unknown Rider';
+  const uploaderHandle = uploaderProfile?.ig_handle;
+
   return (
     <>
       {/* 這是原本的卡片 (永遠只顯示縮圖與資訊) */}
@@ -335,6 +347,30 @@ function TrickCard({
         </div>
 
         <div className="flex flex-1 flex-col p-5">
+          {/* 新增：Uploader 資訊列 */}
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-8 w-8 overflow-hidden rounded-full border bg-muted">
+              {uploaderAvatar ? (
+                <img src={uploaderAvatar} alt={uploaderName} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs font-bold">
+                {uploaderName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium leading-none">{uploaderName}</span>
+              {uploaderHandle && (
+                <a 
+                  href={`https://instagram.com/${uploaderHandle}`} 
+                  target="_blank" 
+                  className="text-xs text-muted-foreground hover:text-pink-500 transition-colors mt-1"
+                >
+                  @{uploaderHandle}
+                </a>
+              )}
+            </div>
+          </div>
           <div className="mb-3 flex items-center justify-between">
             <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-primary">
               {trick.category}

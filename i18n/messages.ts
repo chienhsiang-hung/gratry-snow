@@ -131,6 +131,7 @@ const translations = {
   },
 
   // === TrickList ===
+  tricks: { en: 'Tricks', zh: '收藏招式'},
   loading: { en: 'Loading...', zh: '載入中...' },
   no_tricks: { en: 'No tricks found yet.', zh: '目前還沒有收錄任何招式' },
   be_first: { en: 'Click "Add Trick" at the top right to be the first to upload!', zh: '趕快點擊右上角的新增招式，成為第一個上傳的人吧！' },
@@ -198,9 +199,10 @@ const translations = {
     en: 'This is a private link shared with you. 🏂', 
     zh: '這是一個專屬的私人分享連結 🏂' 
   },
-
   link_instagram: { en: 'Connect Instagram', zh:'連結 Instagram' },
   link_instagram_placeholder: { en: 'e.g. hung_chienhsiang', zh: '例如: hung_chienhsiang' },
+
+  uploaded_by: { en: 'Uploaded by', zh: '上傳者' }
 };
 
 export type Locale = 'en' | 'zh';
