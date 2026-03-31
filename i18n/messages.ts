@@ -198,6 +198,9 @@ const translations = {
     en: 'This is a private link shared with you. 🏂', 
     zh: '這是一個專屬的私人分享連結 🏂' 
   },
+
+  link_instagram: { en: 'Connect Instagram', zh:'連結 Instagram' },
+  link_instagram_placeholder: { en: 'e.g. hung_chienhsiang', zh: '例如: hung_chienhsiang' },
 };
 
 export type Locale = 'en' | 'zh';
