@@ -251,7 +251,7 @@ export function UploadTrickForm() {
   }
 
   // ==========================================
-  // 畫面 B：上傳處理中的進度 UI
+  // 畫面 B：上傳處理中的進度 UI (替換掉整個表單)
   // ==========================================
   if (uploadStep !== 'idle') {
     // 計算總體進度 (0-100%)
@@ -262,7 +262,8 @@ export function UploadTrickForm() {
       overallProgress = 30 + (uploadProgress * 0.6); // 上傳 YT 佔 60%
     } else if (uploadStep === 'saving') {
       overallProgress = 95; // 寫入資料庫給個 95% 假進度，直到變為 success
-    }
+    } 
+    // 🗑️ 刪除了 else if (uploadStep === 'success') 的判斷
 
     // 依據步驟切換頂部 Icon
     const CurrentIcon = () => {
@@ -270,6 +271,7 @@ export function UploadTrickForm() {
         case 'processing': return <Film className="h-6 w-6 animate-pulse text-primary" />;
         case 'uploading': return <UploadCloud className="h-6 w-6 animate-bounce text-primary" />;
         case 'saving': return <Server className="h-6 w-6 animate-pulse text-primary" />;
+        // 🗑️ 刪除了 case 'success': 的判斷
         default: return <Film className="h-6 w-6 text-primary" />;
       }
     };
@@ -288,44 +290,45 @@ export function UploadTrickForm() {
               {uploadStep === 'processing' && t('step_processing')}
               {uploadStep === 'uploading' && t('step_uploading')}
               {uploadStep === 'saving' && t('step_saving')}
+              {/* 🗑️ 刪除了 {uploadStep === 'success' && t('completed')} */}
             </h2>
             <p className="text-sm text-muted-foreground">{t('do_not_close')}</p>
           </div>
 
           {/* 整合的單一進度條 */}
           <div className="space-y-2">
-            <div className="flex justify-between text-sm font-medium">
-              <span>
+            <div className="flex justify-between text-sm font-medium transition-opacity duration-300">
+              <span className="text-foreground">
                 {uploadStep === 'processing' && t('frontend_muting')}
                 {uploadStep === 'uploading' && t('uploading_to_youtube')}
                 {uploadStep === 'saving' && t('saving_to_library')}
+                {/* 🗑️ 刪除了 {uploadStep === 'success' && t('completed')} */}
               </span>
-              <span>{Math.round(overallProgress)}%</span>
+              <span className="text-foreground font-mono">{Math.round(overallProgress)}%</span>
             </div>
             <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
               <div 
-                className="h-full bg-primary transition-all duration-300 ease-out" 
+                className="h-full bg-primary transition-all duration-500 ease-in-out" 
                 style={{ width: `${overallProgress}%` }} 
               />
             </div>
           </div>
 
-          {/* 雙語 YouTube 隱私說明區塊 */}
-          <div className="mt-8 rounded-lg bg-muted/50 p-4 border border-muted flex gap-3 items-start">
-            <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-foreground">Upload Privacy Notice</p>
-                <p className="text-xs text-muted-foreground">
-                  Your video will be uploaded to your connected YouTube account and set as <span className="font-medium text-foreground">"Unlisted"</span>.
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-foreground">上傳隱私說明</p>
-                <p className="text-xs text-muted-foreground">
-                  您的影片將會上傳至您綁定的 YouTube 帳號，並設定為<span className="font-medium text-foreground">「不公開 (Unlisted)」</span>。
-                </p>
-              </div>
+          {/* 單語系 YouTube 隱私說明區塊 (由 i18n 控制) */}
+          <div className="mt-8 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 p-4 border border-blue-100 dark:border-blue-900 flex gap-3 items-start transition-colors">
+            <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                {t('upload_notice_title')}
+              </p>
+              <p className="text-xs text-blue-800/80 dark:text-blue-200/80 leading-relaxed">
+                {/* 處理 Unlisted 關鍵字的 Highlight */}
+                {t('upload_notice_desc').split(/("Unlisted"|「不公開 \(Unlisted\)」)/).map((part, i) => 
+                  part.match(/("Unlisted"|「不公開 \(Unlisted\)」)/) 
+                    ? <span key={i} className="font-medium text-blue-700 dark:text-blue-300">{part}</span> 
+                    : part
+                )}
+              </p>
             </div>
           </div>
 
