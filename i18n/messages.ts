@@ -74,10 +74,6 @@ const translations = {
     en: 'Log in again',
     zh: '重新登入'
   },
-  error_no_token: {
-    en: 'Cannot get Google authorization, please log in again.',
-    zh: '無法取得授權，請重新登入。'
-  },
   provider: { en: 'Provider', zh: '登入方式' },
 
   // =================================================================
