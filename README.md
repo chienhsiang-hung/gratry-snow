@@ -4,10 +4,11 @@ This is a project built with Next.js, Supabase, and Tailwind CSS.
 
 ## ✨ Features
 
-*   **User Authentication:** User registration and login using Supabase.
-*   **Internationalization:** Implemented using `next-intl`.
-*   **Video Upload & Processing:** Supports video uploads and processing with `ffmpeg`.
-*   **User Profiles:** Users can view their profiles and uploaded content.
+* **User Authentication:** User registration and login using Supabase.
+* **Internationalization:** Full i18n support implemented with `next-intl`.
+* **Video Management:** * **YouTube:** Supports client-side video muting via FFmpeg and direct upload.
+    * **Instagram:** Supports adding tricks via Instagram Reels/Posts/Stories links.
+* **Snowboard Trick Library:** Organize, categorize, and mirror videos (Regular/Goofy).
 
 ## 🚀 Getting Started
 
