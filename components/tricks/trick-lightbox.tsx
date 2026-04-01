@@ -50,7 +50,7 @@ export function TrickLightbox({ trick, isOwner, onClose, onUpdate }: { trick: Tr
 
   return (
     <div
-      className="dark fixed inset-0 z-100 flex flex-col items-center justify-start bg-black/80 px-4 backdrop-blur-xl sm:px-12 md:px-24 overflow-y-auto pt-16 pb-12 animate-in fade-in duration-300 ease-out"
+      className="dark fixed inset-0 z-100 flex flex-col items-center justify-start bg-black/80 px-4 backdrop-blur-xl sm:px-12 md:px-24 overflow-y-auto overflow-x-hidden pt-16 pb-12 animate-in fade-in duration-300 ease-out "
       onClick={onClose}
     >
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-50"></div>
