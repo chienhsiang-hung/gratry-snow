@@ -15,6 +15,7 @@ export type Trick = {
   created_at: string
   user_id: string
   video_id: string
+  video_type: 'youtube' | 'instagram'
   category: string
   name: string
   privacy: 'public' | 'private'

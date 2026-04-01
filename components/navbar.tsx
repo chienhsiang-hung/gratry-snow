@@ -5,7 +5,7 @@ import { Link, usePathname } from "@/i18n/routing";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import AuthButton from "@/components/auth-button";
-import { Menu, Home, Upload } from "lucide-react";
+import { Menu, Home, Upload, Bug, MessageSquare } from "lucide-react";
 import { SiGithub } from "react-icons/si"; 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -86,16 +86,45 @@ export default function Navbar() {
                 })}
               </nav>
 
-              <div className="p-6 border-t border-border/20">
-                 <a 
-                   href="https://github.com/chienhsiang-hung/gratry-snow" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
-                 >
-                   <SiGithub className="h-4 w-4 transition-transform group-hover:scale-110 group-hover:rotate-12" />
-                   <span className="font-medium">View on GitHub</span>
-                 </a>
+              <div className="p-4 border-t border-border/20 flex flex-col gap-1 bg-muted/10">
+                {/* Issues 連結 */}
+                <a 
+                  href="https://github.com/chienhsiang-hung/gratry-snow/issues" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300 group"
+                >
+                  <div className="flex items-center justify-center w-6 h-6 rounded-md bg-background shadow-sm border border-border/50 group-hover:border-primary/30 transition-colors">
+                    <Bug className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-primary" />
+                  </div>
+                  <span>{t('issues') || "Report Issue"}</span>
+                </a>
+              
+                {/* Discussions 連結 */}
+                <a
+                  href="https://github.com/chienhsiang-hung/gratry-snow/discussions" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300 group"
+                >
+                  <div className="flex items-center justify-center w-6 h-6 rounded-md bg-background shadow-sm border border-border/50 group-hover:border-primary/30 transition-colors">
+                    <MessageSquare className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110 group-hover:text-primary" />
+                  </div>
+                  <span>{t('discussions') || "Discussions"}</span>
+                </a>
+
+                {/* GitHub 連結 */}
+                <a 
+                  href="https://github.com/chienhsiang-hung/gratry-snow" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300 group"
+                >
+                  <div className="flex items-center justify-center w-6 h-6 rounded-md bg-background shadow-sm border border-border/50 group-hover:border-primary/30 transition-colors">
+                    <SiGithub className="h-3.5 w-3.5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12 group-hover:text-primary" />
+                  </div>
+                  <span>View on GitHub</span>
+                </a>
               </div>
             </SheetContent>
           </Sheet>

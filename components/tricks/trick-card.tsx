@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Lock, Globe, Play, Calendar, Edit } from 'lucide-react'
+import { SiInstagram } from "react-icons/si"; 
 import Image from 'next/image'
 import { useTranslations } from "next-intl"
 import { ShareButton } from "@/components/tricks/share-button"
@@ -26,18 +27,32 @@ export function TrickCard({ trick, currentUser, onUpdate }: { trick: Trick; curr
       <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/30 animate-in fade-in zoom-in-95">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
-            <Image 
-              src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
-              alt={trick.name}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+            
+            {/* 判斷是 IG 還是 YT，顯示不同的縮圖 */}
+            {trick.video_type === 'instagram' ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 transition-transform duration-500 group-hover:scale-105">
+                {/* IG 風格漸層底色 */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-yellow-400/20 via-red-500/20 to-purple-500/20" />
+                <SiInstagram className="relative h-16 w-16 text-white/40 drop-shadow-lg" />
+              </div>
+            ) : (
+              <Image 
+                src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
+                alt={trick.name}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            )}
+
+            {/* 播放按鈕覆蓋層 (共用) */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/30">
               <div className="rounded-full bg-background/90 p-4 text-foreground shadow-lg backdrop-blur-sm transition-transform group-hover:scale-110">
                 <Play className="h-6 w-6 ml-1" />
               </div>
             </div>
+
+            {/* 隱私狀態標籤 (共用) */}
             <div className="absolute right-3 top-3 rounded-md bg-background/90 px-2.5 py-1 text-xs font-medium backdrop-blur-md">
               {trick.privacy === 'private' ? (
                 <span className="flex items-center gap-1.5 text-muted-foreground"><Lock className="h-3.5 w-3.5" /> {t('private')}</span>
@@ -65,6 +80,7 @@ export function TrickCard({ trick, currentUser, onUpdate }: { trick: Trick; curr
                 <a 
                   href={`https://instagram.com/${uploaderHandle}`} 
                   target="_blank" 
+                  rel="noopener noreferrer"
                   className="text-xs text-muted-foreground hover:text-pink-500 transition-colors mt-1"
                 >
                   @{uploaderHandle}
