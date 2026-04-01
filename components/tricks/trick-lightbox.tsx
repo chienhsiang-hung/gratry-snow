@@ -70,7 +70,7 @@ export function TrickLightbox({ trick, isOwner, onClose, onUpdate }: { trick: Tr
           {trick.name}
         </h2>
         
-        <TrickPlayer videoId={trick.video_id} />
+        <TrickPlayer videoId={trick.video_id} videoType={trick.video_type} />
 
         <div className="mt-8 w-full">
           {isEditingNote ? (

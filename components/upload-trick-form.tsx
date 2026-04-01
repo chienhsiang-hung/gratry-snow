@@ -3,7 +3,8 @@
 import { supabase } from '@/lib/supabase/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2, Film, Server, Info } from 'lucide-react';
+// 🚀 新增了 Link2 (避免跟 next-intl 的 Link 撞名) 來當作 IG 的 Icon
+import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, Loader2, CheckCircle2, Film, Server, Info, Link2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { toast } from 'sonner';
@@ -16,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+// 🚀 引入 IG Embed 用於預覽
+import { InstagramEmbed } from 'react-social-media-embed';
 
 export function UploadTrickForm() {
   const t = useTranslations();
@@ -29,17 +32,17 @@ export function UploadTrickForm() {
 
   // 狀態管理
   const [uploadStep, setUploadStep] = useState<'idle' | 'processing' | 'uploading' | 'saving' | 'success'>('idle');
-  const [processProgress, setProcessProgress] = useState(0); // FFmpeg 進度
-  const [uploadProgress, setUploadProgress] = useState(0);   // YouTube 上傳進度
+  const [processProgress, setProcessProgress] = useState(0); 
+  const [uploadProgress, setUploadProgress] = useState(0);   
   const [showOptional, setShowOptional] = useState(false);
+  
+  // 🚀 上傳模式與 IG URL 狀態
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
   const [igUrl, setIgUrl] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef(new FFmpeg());
   
-
-  // 載入 FFmpeg
   const loadFFmpeg = async () => {
     const ffmpeg = ffmpegRef.current;
     if (ffmpeg.loaded) return;
@@ -71,14 +74,12 @@ export function UploadTrickForm() {
     return new File([mutedBlob], `muted_${inputFile.name}`, { type: 'video/mp4' });
   };
 
-  // 輔助函數：使用 XMLHttpRequest 支援進度條的上傳
   const uploadToYouTubeWithProgress = (formData: FormData, token: string): Promise<any> => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status');
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       
-      // 監聽上傳進度
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const percentComplete = Math.round((event.loaded / event.total) * 100);
@@ -92,7 +93,6 @@ export function UploadTrickForm() {
         } else {
           try {
             const errorData = JSON.parse(xhr.responseText);
-            // 如果是 401 或 403 (沒有權限)，在錯誤訊息前加上標記
             const isAuthError = xhr.status === 401 || xhr.status === 403;
             const prefix = isAuthError ? '[AUTH_ERROR] ' : '';
             reject(new Error(prefix + (errorData.error?.message || '上傳失敗')));
@@ -126,6 +126,7 @@ export function UploadTrickForm() {
     });
   };
 
+  // 🚀 驗證 IG URL 是否合法
   const extractIgId = (url: string) => {
     const regex = /instagram\.com\/(?:p|reel|reels)\/([^/?#&]+)/;
     const match = url.match(regex);
@@ -142,12 +143,10 @@ export function UploadTrickForm() {
       }
 
       try {
-        // --- 步驟 A：前端靜音處理 ---
         setUploadStep('processing');
         setProcessProgress(0);
         const mutedFile = await processVideoToMute(file);
 
-        // --- 步驟 B：開始上傳至 YouTube ---
         setUploadStep('uploading');
         setUploadProgress(0);
         
@@ -176,11 +175,9 @@ export function UploadTrickForm() {
         formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
         formData.append('file', mutedFile);
 
-        // 改用 XHR 來獲取進度
         const data = await uploadToYouTubeWithProgress(formData, providerToken);
         const videoId = data.id;
         
-        // --- 步驟 C：寫入 Supabase 資料庫 ---
         setUploadStep('saving');
         const userId = session?.user?.id;
         if (!userId) throw new Error('無法取得使用者 ID');
@@ -200,27 +197,23 @@ export function UploadTrickForm() {
 
         if (dbError) throw new Error('寫入資料庫失敗');
 
-        // 觸發成功畫面
         toast.success(t('upload_success'));
         setUploadStep('success');
 
       } catch (error: any) {
         console.error(error);
-        
         const errMsg = error.message || '';
-        // 只要包含我們自訂的標記，或者是網路錯誤導致完全沒抓到 status，我們都可以嘗試讓使用者重新登入
         const isAuthError = errMsg.includes('[AUTH_ERROR]'); 
 
         if (isAuthError) {
-          showAuthErrorToast(); // <--- 呼叫同一個函數
+          showAuthErrorToast(); 
         } else {
-          toast.error(`發生錯誤: ${errMsg.replace('[AUTH_ERROR] ', '')}`); // 顯示給使用者時把標記拿掉
+          toast.error(`發生錯誤: ${errMsg.replace('[AUTH_ERROR] ', '')}`); 
         }
-        
         setUploadStep('idle');
       }
     } else {
-      // IG 連結處理模式
+      // 🚀 IG 連結處理模式
       const igId = extractIgId(igUrl);
       if (!igId) {
         toast.error("請輸入正確的 Instagram Reels 或貼文連結");
@@ -231,12 +224,12 @@ export function UploadTrickForm() {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       if (!userId) throw new Error('無法取得使用者 ID');
-      // 直接將 IG 連結或 ID 寫入資料庫
+      
       const { error: dbError } = await supabase
         .from('tricks')
         .insert([{
             user_id: userId,
-            video_id: igUrl, // 建議存完整 URL，方便 embed 套件使用
+            video_id: igUrl, 
             video_type: 'instagram',
             category: category,
             name: trickName,
@@ -260,14 +253,12 @@ export function UploadTrickForm() {
     setTrickName('');
     setTitle('');
     setDescription('');
+    setIgUrl('');
     setUploadStep('idle');
     setProcessProgress(0);
     setUploadProgress(0);
   };
 
-  // ==========================================
-  // 畫面 A：成功狀態 UI
-  // ==========================================
   if (uploadStep === 'success') {
     return (
       <div className="w-full max-w-2xl space-y-6 rounded-2xl border bg-card p-10 shadow-lg text-center animate-in zoom-in-95 duration-500">
@@ -279,7 +270,7 @@ export function UploadTrickForm() {
         <div className="space-y-3">
           <h2 className="text-3xl font-extrabold tracking-tight">{t("upload_success")}</h2>
           <p className="text-muted-foreground text-base leading-relaxed max-w-md mx-auto">
-            {t("youtube_processing_desc")}
+            {uploadMode === 'file' ? t("youtube_processing_desc") : "招式已成功儲存至你的進度中！"}
           </p>
         </div>
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -296,28 +287,21 @@ export function UploadTrickForm() {
     );
   }
 
-  // ==========================================
-  // 畫面 B：上傳處理中的進度 UI (替換掉整個表單)
-  // ==========================================
   if (uploadStep !== 'idle') {
-    // 計算總體進度 (0-100%)
     let overallProgress = 0;
     if (uploadStep === 'processing') {
-      overallProgress = processProgress * 0.3; // 轉檔佔 30%
+      overallProgress = processProgress * 0.3; 
     } else if (uploadStep === 'uploading') {
-      overallProgress = 30 + (uploadProgress * 0.6); // 上傳 YT 佔 60%
+      overallProgress = 30 + (uploadProgress * 0.6); 
     } else if (uploadStep === 'saving') {
-      overallProgress = 95; // 寫入資料庫給個 95% 假進度，直到變為 success
+      overallProgress = 95; 
     } 
-    // 🗑️ 刪除了 else if (uploadStep === 'success') 的判斷
 
-    // 依據步驟切換頂部 Icon
     const CurrentIcon = () => {
       switch (uploadStep) {
         case 'processing': return <Film className="h-6 w-6 animate-pulse text-primary" />;
         case 'uploading': return <UploadCloud className="h-6 w-6 animate-bounce text-primary" />;
         case 'saving': return <Server className="h-6 w-6 animate-pulse text-primary" />;
-        // 🗑️ 刪除了 case 'success': 的判斷
         default: return <Film className="h-6 w-6 text-primary" />;
       }
     };
@@ -325,7 +309,6 @@ export function UploadTrickForm() {
     return (
       <div className="w-full max-w-2xl rounded-xl border bg-card p-6 sm:p-8 shadow-sm flex flex-col items-center justify-center min-h-[400px] animate-in fade-in zoom-in-95 duration-300">
         <div className="w-full max-w-md space-y-8">
-          
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -336,19 +319,16 @@ export function UploadTrickForm() {
               {uploadStep === 'processing' && t('step_processing')}
               {uploadStep === 'uploading' && t('step_uploading')}
               {uploadStep === 'saving' && t('step_saving')}
-              {/* 🗑️ 刪除了 {uploadStep === 'success' && t('completed')} */}
             </h2>
             <p className="text-sm text-muted-foreground">{t('do_not_close')}</p>
           </div>
 
-          {/* 整合的單一進度條 */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm font-medium transition-opacity duration-300">
               <span className="text-foreground">
                 {uploadStep === 'processing' && t('frontend_muting')}
                 {uploadStep === 'uploading' && t('uploading_to_youtube')}
                 {uploadStep === 'saving' && t('saving_to_library')}
-                {/* 🗑️ 刪除了 {uploadStep === 'success' && t('completed')} */}
               </span>
               <span className="text-foreground font-mono">{Math.round(overallProgress)}%</span>
             </div>
@@ -360,32 +340,28 @@ export function UploadTrickForm() {
             </div>
           </div>
 
-          {/* 單語系 YouTube 隱私說明區塊 (由 i18n 控制) */}
-          <div className="mt-8 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 p-4 border border-blue-100 dark:border-blue-900 flex gap-3 items-start transition-colors">
-            <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                {t('upload_notice_title')}
-              </p>
-              <p className="text-xs text-blue-800/80 dark:text-blue-200/80 leading-relaxed">
-                {/* 處理 Unlisted 關鍵字的 Highlight */}
-                {t('upload_notice_desc').split(/("Unlisted"|「不公開 \(Unlisted\)」)/).map((part, i) => 
-                  part.match(/("Unlisted"|「不公開 \(Unlisted\)」)/) 
-                    ? <span key={i} className="font-medium text-blue-700 dark:text-blue-300">{part}</span> 
-                    : part
-                )}
-              </p>
+          {uploadMode === 'file' && (
+            <div className="mt-8 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 p-4 border border-blue-100 dark:border-blue-900 flex gap-3 items-start transition-colors">
+              <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                  {t('upload_notice_title')}
+                </p>
+                <p className="text-xs text-blue-800/80 dark:text-blue-200/80 leading-relaxed">
+                  {t('upload_notice_desc').split(/("Unlisted"|「不公開 \(Unlisted\)」)/).map((part, i) => 
+                    part.match(/("Unlisted"|「不公開 \(Unlisted\)」)/) 
+                      ? <span key={i} className="font-medium text-blue-700 dark:text-blue-300">{part}</span> 
+                      : part
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
-
+          )}
         </div>
       </div>
     );
   }
 
-  // ==========================================
-  // 畫面 C：預設表單 UI (idle 狀態)
-  // ==========================================
   return (
     <form 
       onSubmit={handleSubmit} 
@@ -397,43 +373,102 @@ export function UploadTrickForm() {
       </div>
 
       <div className="space-y-6">
-        {/* 影片檔案上傳區塊 */}
-        <div className="flex w-full flex-col items-center justify-center gap-2">
-          {!file ? (
-            <label htmlFor="video-upload" className="group flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/25 bg-muted/30 transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
-              <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                <div className="mb-4 rounded-full bg-background p-4 shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:shadow-md">
-                  <UploadCloud className="h-8 w-8 text-muted-foreground transition-colors group-hover:text-primary" />
-                </div>
-                <p className="mb-2 text-sm font-semibold text-foreground">{t("click_to_upload")}</p>
-                <p className="text-xs text-muted-foreground">{t("support_formats")}</p>
-              </div>
-              <input 
-                id="video-upload" 
-                type="file" 
-                accept="video/*" 
-                className="hidden" 
-                ref={fileInputRef}
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-              />
-            </label>
-          ) : (
-            <div className="flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/5 p-4 transition-all animate-in zoom-in-95">
-              <div className="flex items-center space-x-3 overflow-hidden">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-                  <UploadCloud className="h-5 w-5 text-primary" />
-                </div>
-                <div className="truncate">
-                  <p className="truncate text-sm font-medium">{file.name}</p>
-                  <p className="text-xs text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
-                </div>
-              </div>
-              <Button type="button" variant="ghost" size="icon" onClick={clearFile} className="shrink-0 text-muted-foreground hover:text-destructive">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+        {/* 🚀 模式切換器 (Toggle Group) */}
+        <div className="flex w-full rounded-lg border bg-muted p-1">
+          <button
+            type="button"
+            onClick={() => setUploadMode('file')}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-all ${
+              uploadMode === 'file' 
+                ? 'bg-background text-foreground shadow-sm' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <UploadCloud className="h-4 w-4" />
+            上傳檔案 (YouTube)
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadMode('url')}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-all ${
+              uploadMode === 'url' 
+                ? 'bg-background text-foreground shadow-sm' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Link2 className="h-4 w-4" />
+            貼上連結 (Instagram)
+          </button>
         </div>
+
+        {/* 🚀 依據模式顯示不同的輸入區塊 */}
+        {uploadMode === 'file' ? (
+          <div className="flex w-full flex-col items-center justify-center gap-2 animate-in fade-in duration-300">
+            {!file ? (
+              <label htmlFor="video-upload" className="group flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/25 bg-muted/30 transition-all duration-300 hover:border-primary/50 hover:bg-primary/5">
+                <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                  <div className="mb-4 rounded-full bg-background p-4 shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:shadow-md">
+                    <UploadCloud className="h-8 w-8 text-muted-foreground transition-colors group-hover:text-primary" />
+                  </div>
+                  <p className="mb-2 text-sm font-semibold text-foreground">{t("click_to_upload")}</p>
+                  <p className="text-xs text-muted-foreground">{t("support_formats")}</p>
+                </div>
+                <input 
+                  id="video-upload" 
+                  type="file" 
+                  accept="video/*" 
+                  className="hidden" 
+                  ref={fileInputRef}
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                />
+              </label>
+            ) : (
+              <div className="flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/5 p-4 transition-all animate-in zoom-in-95">
+                <div className="flex items-center space-x-3 overflow-hidden">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                    <UploadCloud className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="truncate">
+                    <p className="truncate text-sm font-medium">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <Button type="button" variant="ghost" size="icon" onClick={clearFile} className="shrink-0 text-muted-foreground hover:text-destructive">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex w-full flex-col gap-4 animate-in fade-in duration-300">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Instagram 連結 <span className="text-destructive">*</span></label>
+              <input 
+                type="url" 
+                value={igUrl}
+                onChange={(e) => setIgUrl(e.target.value)}
+                placeholder="例如: https://www.instagram.com/reel/C4x..."
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                required={uploadMode === 'url'}
+              />
+            </div>
+            
+            {/* IG 預覽區塊 */}
+            {igUrl && extractIgId(igUrl) ? (
+              <div className="w-full rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col items-center justify-center animate-in zoom-in-95">
+                <p className="text-xs text-muted-foreground mb-3 font-medium">影片預覽確認</p>
+                <div className="w-full max-w-[328px] overflow-hidden rounded-lg shadow-sm pointer-events-none opacity-90">
+                  {/* 使用 pointer-events-none 避免在表單操作時不小心點擊到 IG 連結跳轉 */}
+                  <InstagramEmbed url={igUrl} width="100%" />
+                </div>
+              </div>
+            ) : igUrl ? (
+              <p className="text-xs text-destructive flex items-center gap-1">
+                <Info className="h-3 w-3" /> 請輸入有效的 Instagram 網址
+              </p>
+            ) : null}
+          </div>
+        )}
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="space-y-2">
@@ -524,7 +559,12 @@ export function UploadTrickForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full text-base relative overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]" size="lg">
+      <Button 
+        type="submit" 
+        className="w-full text-base relative overflow-hidden transition-transform hover:scale-[1.02] active:scale-[0.98]" 
+        size="lg"
+        disabled={uploadMode === 'file' ? !file : !igUrl}
+      >
         {t('submit_upload')}
       </Button>
     </form>
