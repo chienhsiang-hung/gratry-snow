@@ -32,9 +32,12 @@ export function UploadTrickForm() {
   const [processProgress, setProcessProgress] = useState(0); // FFmpeg 進度
   const [uploadProgress, setUploadProgress] = useState(0);   // YouTube 上傳進度
   const [showOptional, setShowOptional] = useState(false);
+  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
+  const [igUrl, setIgUrl] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef(new FFmpeg());
+  
 
   // 載入 FFmpeg
   const loadFFmpeg = async () => {
@@ -123,89 +126,127 @@ export function UploadTrickForm() {
     });
   };
 
+  const extractIgId = (url: string) => {
+    const regex = /instagram\.com\/(?:p|reel|reels)\/([^/?#&]+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !category || !trickName) {
-      toast.error(t('error_missing_fields'));
-      return;
-    }
 
-    try {
-      // --- 步驟 A：前端靜音處理 ---
-      setUploadStep('processing');
-      setProcessProgress(0);
-      const mutedFile = await processVideoToMute(file);
-
-      // --- 步驟 B：開始上傳至 YouTube ---
-      setUploadStep('uploading');
-      setUploadProgress(0);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      const providerToken = session?.provider_token;
-
-      if (!providerToken) {
-        showAuthErrorToast();
-        setUploadStep('idle');
+    if (uploadMode === 'file') {
+      if (!file || !category || !trickName) {
+        toast.error(t('error_missing_fields'));
         return;
       }
 
-      const metadata = {
-        snippet: {
-          title: title || trickName,
-          description: description || `招式: ${trickName}\n分類: ${category}\n\nUploaded via Gratry Snow`,
-          categoryId: '17', 
-        },
-        status: {
-          privacyStatus: 'unlisted', 
-          embeddable: true, 
-        },
-      };
+      try {
+        // --- 步驟 A：前端靜音處理 ---
+        setUploadStep('processing');
+        setProcessProgress(0);
+        const mutedFile = await processVideoToMute(file);
 
-      const formData = new FormData();
-      formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      formData.append('file', mutedFile);
+        // --- 步驟 B：開始上傳至 YouTube ---
+        setUploadStep('uploading');
+        setUploadProgress(0);
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        const providerToken = session?.provider_token;
 
-      // 改用 XHR 來獲取進度
-      const data = await uploadToYouTubeWithProgress(formData, providerToken);
-      const videoId = data.id;
-      
-      // --- 步驟 C：寫入 Supabase 資料庫 ---
+        if (!providerToken) {
+          showAuthErrorToast();
+          setUploadStep('idle');
+          return;
+        }
+
+        const metadata = {
+          snippet: {
+            title: title || trickName,
+            description: description || `招式: ${trickName}\n分類: ${category}\n\nUploaded via Gratry Snow`,
+            categoryId: '17', 
+          },
+          status: {
+            privacyStatus: 'unlisted', 
+            embeddable: true, 
+          },
+        };
+
+        const formData = new FormData();
+        formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        formData.append('file', mutedFile);
+
+        // 改用 XHR 來獲取進度
+        const data = await uploadToYouTubeWithProgress(formData, providerToken);
+        const videoId = data.id;
+        
+        // --- 步驟 C：寫入 Supabase 資料庫 ---
+        setUploadStep('saving');
+        const userId = session?.user?.id;
+        if (!userId) throw new Error('無法取得使用者 ID');
+
+        const { error: dbError } = await supabase
+          .from('tricks')
+          .insert([{
+              user_id: userId,
+              video_id: videoId,
+              video_type: 'youtube',
+              category: category,
+              name: trickName,
+              privacy: privacy,
+              title: title || null,
+              description: description || null,
+          }]);
+
+        if (dbError) throw new Error('寫入資料庫失敗');
+
+        // 觸發成功畫面
+        toast.success(t('upload_success'));
+        setUploadStep('success');
+
+      } catch (error: any) {
+        console.error(error);
+        
+        const errMsg = error.message || '';
+        // 只要包含我們自訂的標記，或者是網路錯誤導致完全沒抓到 status，我們都可以嘗試讓使用者重新登入
+        const isAuthError = errMsg.includes('[AUTH_ERROR]'); 
+
+        if (isAuthError) {
+          showAuthErrorToast(); // <--- 呼叫同一個函數
+        } else {
+          toast.error(`發生錯誤: ${errMsg.replace('[AUTH_ERROR] ', '')}`); // 顯示給使用者時把標記拿掉
+        }
+        
+        setUploadStep('idle');
+      }
+    } else {
+      // IG 連結處理模式
+      const igId = extractIgId(igUrl);
+      if (!igId) {
+        toast.error("請輸入正確的 Instagram Reels 或貼文連結");
+        return;
+      }
+
       setUploadStep('saving');
+      const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       if (!userId) throw new Error('無法取得使用者 ID');
-
+      // 直接將 IG 連結或 ID 寫入資料庫
       const { error: dbError } = await supabase
         .from('tricks')
         .insert([{
             user_id: userId,
-            video_id: videoId,
+            video_id: igUrl, // 建議存完整 URL，方便 embed 套件使用
+            video_type: 'instagram',
             category: category,
             name: trickName,
             privacy: privacy,
             title: title || null,
             description: description || null,
         }]);
-
+      
       if (dbError) throw new Error('寫入資料庫失敗');
-
-      // 觸發成功畫面
-      toast.success(t('upload_success'));
       setUploadStep('success');
-
-    } catch (error: any) {
-      console.error(error);
-      
-      const errMsg = error.message || '';
-      // 只要包含我們自訂的標記，或者是網路錯誤導致完全沒抓到 status，我們都可以嘗試讓使用者重新登入
-      const isAuthError = errMsg.includes('[AUTH_ERROR]'); 
-
-      if (isAuthError) {
-        showAuthErrorToast(); // <--- 呼叫同一個函數
-      } else {
-        toast.error(`發生錯誤: ${errMsg.replace('[AUTH_ERROR] ', '')}`); // 顯示給使用者時把標記拿掉
-      }
-      
-      setUploadStep('idle');
     }
   };
 

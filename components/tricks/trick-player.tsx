@@ -5,8 +5,9 @@ import YouTube, { YouTubeEvent, YouTubePlayer } from 'react-youtube';
 import { Button } from '@/components/ui/button';
 import { FlipHorizontal, VolumeX, Volume2, Play, Pause } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { InstagramEmbed } from 'react-social-media-embed';
 
-export function TrickPlayer({ videoId }: { videoId: string }) {
+export function TrickPlayer({ videoId, videoType='youtube' }: { videoId: string, videoType?: string }) {
   const t = useTranslations();
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [playbackRate, setPlaybackRate] = useState(1);
@@ -45,17 +46,21 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
     }
   }, [videoId]);
 
-  const onReady = (event: YouTubeEvent) => {
+  const onReady = async (event: YouTubeEvent) => {
     const ytPlayer = event.target;
     setPlayer(ytPlayer);
     ytPlayer.mute();
     setIsMuted(true);
-    setDuration(ytPlayer.getDuration());
+
+    const duration = await ytPlayer.getDuration();
+    setDuration(duration);
   };
 
-  const handlePlay = (event: YouTubeEvent) => {
+  const handlePlay = async (event: YouTubeEvent) => {
     setIsPlayingVideo(true);
-    setDuration(event.target.getDuration() || 0);
+
+    const duration = await event.target.getDuration() || 0;
+    setDuration(duration);
   };
   const handlePause = () => setIsPlayingVideo(false);
   const handleEnd = () => setIsPlayingVideo(false);
@@ -110,6 +115,14 @@ export function TrickPlayer({ videoId }: { videoId: string }) {
       setIsMuted(!isMuted);
     }
   };
+
+  if (videoType === 'instagram') {
+    return (
+      <div className="flex justify-center w-full bg-black rounded-2xl overflow-hidden aspect-[9/16]">
+        <InstagramEmbed url={videoId} width="100%" />
+      </div>
+    );
+  }
 
   return (
     // 🚀 修改：如果偵測到是直式影片，就限制最大寬度並置中，看起來才像手機

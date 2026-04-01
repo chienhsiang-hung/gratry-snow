@@ -9,6 +9,7 @@ import { TrickLightbox } from './trick-lightbox'
 import { TrickEditModal } from './trick-edit-modal'
 import type { Trick } from './trick-list'
 
+
 export function TrickCard({ trick, currentUser, onUpdate }: { trick: Trick; currentUser: any; onUpdate: (trick: Trick) => void }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -21,13 +22,17 @@ export function TrickCard({ trick, currentUser, onUpdate }: { trick: Trick; curr
   const uploaderName = uploaderProfile?.ig_name || uploaderProfile?.username || 'Unknown Rider';
   const uploaderHandle = uploaderProfile?.ig_handle;
 
+  // 判斷縮圖來源
+  const thumbnailUrl = trick.video_type === 'instagram' 
+    ? '/images/ig-placeholder.jpg' // 你可以準備一張精美的 IG 招式佔位圖
+    : `https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`;
   return (
     <>
       <div className="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/30 animate-in fade-in zoom-in-95">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <div className="relative h-full w-full cursor-pointer" onClick={() => setIsPlaying(true)}>
             <Image 
-              src={`https://img.youtube.com/vi/${trick.video_id}/hqdefault.jpg`} 
+              src={thumbnailUrl} 
               alt={trick.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
