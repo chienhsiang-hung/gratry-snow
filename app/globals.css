@@ -127,4 +127,13 @@
   html {
     @apply font-sans;
   }
+
+  /* ▼▼▼ 新增這段：防止 iOS Safari 在點擊輸入框時自動 Zoom In ▼▼▼ */
+  @media screen and (max-width: 768px) {
+    input, 
+    textarea, 
+    select {
+      font-size: 16px !important;
+    }
+  }
 }
