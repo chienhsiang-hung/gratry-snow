@@ -27,3 +27,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## 4. 資料庫概念 (Supabase)
 - **Tricks Table:** 負責記錄使用者的招式。核心欄位包含 `user_id`, `video_id` (存放 YT ID 或 IG URL), `video_type` ('youtube' | 'instagram'), `category`, `name`, `privacy` ('public' | 'private')。
+- **外部嵌入:** `react-social-media-embed` (處理 Instagram 嵌入)
+
+## 5. 技術細節與限制 (Known Issues & Limitations)
+- **Instagram Embed 限制:** 官方 Embed API **不支援**限時動態 (Stories) 與精選動態 (Highlights) 的預覽。
+  - **處理方式:** 偵測到此類連結時，改為顯示「已記錄」的 Fallback UI，並引導使用者點擊連結前往 Instagram 觀看。
+- **影片縮圖:** - YouTube 使用 `img.youtube.com` 獲取。
+  - Instagram 因為 API 限制，統一使用專屬的 CSS 漸層 Placeholder + Icon 處理，不抓取實體圖檔。
