@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import YouTube, { YouTubeEvent, YouTubePlayer } from 'react-youtube';
 import { Button } from '@/components/ui/button';
-import { FlipHorizontal, VolumeX, Volume2, Play, Pause } from 'lucide-react';
+import { FlipHorizontal, VolumeX, Volume2, Play, Pause, ExternalLink } from 'lucide-react';
+import { SiInstagram } from "react-icons/si"; 
 import { useTranslations } from 'next-intl';
 import { InstagramEmbed } from 'react-social-media-embed';
 
@@ -117,8 +118,39 @@ export function TrickPlayer({ videoId, videoType='youtube' }: { videoId: string,
   };
 
   if (videoType === 'instagram') {
+    // 判斷是否為限時動態或精選
+    const isIgStory = videoId.includes('/s/') || videoId.includes('/stories/') || videoId.includes('story_media_id');
+
+    if (isIgStory) {
+      return (
+        <div className="flex flex-col items-center justify-center w-full max-w-[400px] mx-auto bg-black/40 border border-white/10 rounded-2xl overflow-hidden aspect-[9/16] p-6 text-center shadow-2xl backdrop-blur-xl transition-all">
+          {/* IG 漸層外框 Icon */}
+          <div className="rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-[2px] mb-5 shadow-lg">
+            <div className="bg-black rounded-full p-4">
+              <SiInstagram className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          
+          <p className="text-white font-bold mb-2 text-lg tracking-wide">{t('ig_story_recorded')}</p>
+          <p className="text-white/60 text-sm mb-8 max-w-[260px] leading-relaxed">
+            {t('ig_story_no_preview')}
+          </p>
+          
+          {/* 前往 IG 觀看按鈕 */}
+          <Button asChild size="lg" className="rounded-full font-bold bg-white text-black hover:bg-gray-200 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)] w-full max-w-[200px]">
+            <a href={videoId} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              {t('view_on_ig')}
+            </a>
+          </Button>
+        </div>
+      );
+    }
+
+    // 一般的 Reels 或貼文，正常顯示 Embed
+    // 順便加上 max-w-[400px] 與 mx-auto，避免在電腦版上被拉得太巨大
     return (
-      <div className="flex justify-center w-full bg-black rounded-2xl overflow-hidden aspect-[9/16]">
+      <div className="flex justify-center w-full max-w-[400px] mx-auto bg-black rounded-2xl overflow-hidden aspect-[9/16] shadow-xl">
         <InstagramEmbed url={videoId} width="100%" />
       </div>
     );

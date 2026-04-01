@@ -239,6 +239,7 @@ const translations = {
   mute: { en: 'Mute', zh: '靜音' },
   regular_stance: { en: 'Regular', zh: 'Regular 視角' },
   goofy_stance: { en: 'Goofy', zh: 'Goofy 視角' },
+  view_on_ig: { en: 'View on Instagram', zh: '前往 Instagram 觀看' },
 
   // =================================================================
   // Profile
