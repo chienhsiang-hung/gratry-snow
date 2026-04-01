@@ -128,7 +128,14 @@ const translations = {
     en: 'Please fill in required fields and select a video!',
     zh: '請填寫必填欄位並選擇影片！'
   },
-
+  // --- Upload Modes & IG ---
+  mode_file: { en: 'Upload File (YouTube)', zh: '上傳檔案 (YouTube)' },
+  mode_url: { en: 'Paste Link (Instagram)', zh: '貼上連結 (Instagram)' },
+  ig_link_label: { en: 'Instagram Link', zh: 'Instagram 連結' },
+  ig_url_placeholder: { en: 'e.g. https://www.instagram.com/reel/C4x...', zh: '例如: https://www.instagram.com/reel/C4x...' },
+  ig_preview_confirm: { en: 'Video Preview', zh: '影片預覽確認' },
+  error_invalid_ig_url: { en: 'Please enter a valid Instagram Reels or post link.', zh: '請輸入正確的 Instagram Reels 或貼文連結' },
+  ig_upload_success_desc: { en: 'Trick successfully saved to your progress!', zh: '招式已成功儲存至你的進度中！' },
   // --- Progress ---
   uploading: { en: 'Uploading to YouTube...', zh: '正在上傳至 YouTube...' },
   processing_video: { en: 'Processing video...', zh: '影片靜音處理中...' },
