@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase/supabase';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, Lock, Globe, X, ChevronDown, ChevronUp, CheckCircle2, Film, Server, Info, Link2 } from 'lucide-react';
+import { SiInstagram } from "react-icons/si"; 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { toast } from 'sonner';
@@ -150,10 +151,11 @@ export function UploadTrickForm() {
   
   // 提取 IG ID 的 Regex
   const extractIgId = (url: string) => {
-    const regex = /instagram\.com\/(?:p|reel|reels|s)\/([^/?#&]+)/;
+    const regex = /instagram\.com\/(?:p|reel|reels|s|stories)\/([^/?#&]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
+  const isIgStory = igUrl.includes('/s/') || igUrl.includes('/stories/') || igUrl.includes('story_media_id');
 
   const loadFFmpeg = async () => {
     const ffmpeg = ffmpegRef.current;
@@ -334,12 +336,30 @@ export function UploadTrickForm() {
       <div className="space-y-6">
         {/* 切換模式 */}
         <div className="flex w-full rounded-lg border bg-muted p-1">
-          <button type="button" onClick={() => setUploadMode('file')} className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-all ${uploadMode === 'file' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
-            <UploadCloud className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setUploadMode('file')}
+            className={`
+              flex flex-1 flex-col items-center justify-center gap-1 
+              rounded-md py-2.5 text-xs leading-tight transition-all
+              sm:flex-row sm:gap-2 sm:text-sm
+              ${uploadMode === 'file' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}
+            `}
+          >
+            <UploadCloud className="h-4 w-4 shrink-0" />
             {t('mode_file')}
           </button>
-          <button type="button" onClick={() => setUploadMode('url')} className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium transition-all ${uploadMode === 'url' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
-            <Link2 className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => setUploadMode('url')}
+            className={`
+              flex flex-1 flex-col items-center justify-center gap-1 
+              rounded-md py-2.5 text-xs leading-tight transition-all
+              sm:flex-row sm:gap-2 sm:text-sm
+              ${uploadMode === 'url' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}
+            `}
+          >
+            <Link2 className="h-4 w-4 shrink-0" />
             {t('mode_url')}
           </button>
         </div>
@@ -382,12 +402,26 @@ export function UploadTrickForm() {
               <input type="url" value={igUrl} onChange={(e) => setIgUrl(e.target.value)} placeholder={t('ig_url_placeholder')} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required={uploadMode === 'url'} />
             </div>
             {igUrl && extractIgId(igUrl) ? (
-              <div className="w-full rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col items-center justify-center animate-in zoom-in-95">
-                <p className="text-xs text-muted-foreground mb-3 font-medium">{t('ig_preview_confirm')}</p>
-                <div className="w-full max-w-[328px] overflow-hidden rounded-lg shadow-sm pointer-events-none opacity-90">
-                  <InstagramEmbed url={igUrl} width="100%" />
+              isIgStory ? (
+                // 限時動態/精選動態的 Fallback UI
+                <div className="w-full rounded-xl border border-primary/20 bg-primary/5 p-6 flex flex-col items-center justify-center animate-in zoom-in-95">
+                  <div className="rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-[2px] mb-3">
+                    <div className="bg-background rounded-full p-2">
+                      <SiInstagram className="h-6 w-6 text-foreground" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-bold mb-1">{t('ig_story_recorded')}</p>
+                  <p className="text-xs text-muted-foreground text-center max-w-[280px]">{t('ig_story_no_preview')}</p>
                 </div>
-              </div>
+              ) : (
+                // 一般貼文/Reels 的正常預覽
+                <div className="w-full rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col items-center justify-center animate-in zoom-in-95">
+                  <p className="text-xs text-muted-foreground mb-3 font-medium">{t('ig_preview_confirm')}</p>
+                  <div className="w-full max-w-[328px] overflow-hidden rounded-lg shadow-sm pointer-events-none opacity-90">
+                    <InstagramEmbed url={igUrl} width="100%" />
+                  </div>
+                </div>
+              )
             ) : igUrl ? (
               <p className="text-xs text-destructive flex items-center gap-1"><Info className="h-3 w-3" /> {t('error_invalid_ig_url')}</p>
             ) : null}

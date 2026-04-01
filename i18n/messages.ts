@@ -136,6 +136,8 @@ const translations = {
   ig_preview_confirm: { en: 'Video Preview', zh: '影片預覽確認' },
   error_invalid_ig_url: { en: 'Please enter a valid Instagram Reels or post link.', zh: '請輸入正確的 Instagram Reels 或貼文連結' },
   ig_upload_success_desc: { en: 'Trick successfully saved to your progress!', zh: '招式已成功儲存至你的進度中！' },
+  ig_story_recorded: { en: 'Story/Highlight Recorded', zh: '限時 / 精選動態已記錄' },
+  ig_story_no_preview: { en: 'Instagram does not support previews for stories, but the link can still be saved.', zh: 'IG 官方不開放限時動態預覽，但連結仍可正常儲存。' },
   // --- Progress ---
   uploading: { en: 'Uploading to YouTube...', zh: '正在上傳至 YouTube...' },
   processing_video: { en: 'Processing video...', zh: '影片靜音處理中...' },
