@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { TrickSkeleton } from "@/components/tricks/trick-skeleton";
 
+export const dynamic = 'force-dynamic';
+
 export const dynamicParams = false;
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

@@ -31,10 +31,17 @@ export default function AuthButton() {
   const [loading, setLoading] = useState(true);
 
   const handleLogin = async () => {
+    const redirectTo = `${window.location.origin}/api/auth/callback?next=${window.location.pathname}`;
+    // console.log("redirectTo:", redirectTo);
+
+    // // 2. 加上這行，按下「確定」才會繼續跑下面的 Supabase 登入
+    // if (!window.confirm(`即將跳轉，請確認網址：\n${redirectTo}`)) {
+    //   return; // 如果按「取消」，就不執行登入跳轉
+    // }
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}${window.location.pathname}`,
+        redirectTo: redirectTo,
         scopes: 'https://www.googleapis.com/auth/youtube.upload'
       }
     });
