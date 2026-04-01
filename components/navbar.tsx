@@ -86,16 +86,34 @@ export default function Navbar() {
                 })}
               </nav>
 
-              <div className="p-6 border-t border-border/20">
-                 <a 
-                   href="https://github.com/chienhsiang-hung/gratry-snow" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
-                 >
-                   <SiGithub className="h-4 w-4 transition-transform group-hover:scale-110 group-hover:rotate-12" />
-                   <span className="font-medium">View on GitHub</span>
-                 </a>
+              <div className="p-6 border-t border-border/20 flex flex-col gap-4">
+                <a 
+                  href="https://github.com/chienhsiang-hung/gratry-snow/issues" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <span className="font-medium">{t('issues') || "Report Issue"}</span>
+                </a>
+
+                <a 
+                  href="https://github.com/chienhsiang-hung/gratry-snow/discussions" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <span className="font-medium">{t('discussions') || "Discussions"}</span>
+                </a>
+
+                <a 
+                  href="https://github.com/chienhsiang-hung/gratry-snow" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors group"
+                >
+                  <SiGithub className="h-4 w-4 transition-transform group-hover:scale-110 group-hover:rotate-12" />
+                  <span className="font-medium">View on GitHub</span>
+                </a>
               </div>
             </SheetContent>
           </Sheet>

@@ -85,6 +85,7 @@ export default async function RootLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const t = await getTranslations({ locale });
 
   return (
     <html
@@ -107,14 +108,35 @@ export default async function RootLayout({
               </main>
 
               <footer className="border-t py-6 bg-background/95">
-                <div className="container mx-auto flex flex-col items-center justify-center gap-4 px-4 md:flex-row md:gap-8 text-sm text-muted-foreground">
-                  <p>© {new Date().getFullYear()} Gratry Snow. All rights reserved.</p>
-                  <div className="flex gap-4">
-                    <Link href="/privacy" className="hover:text-foreground transition-colors">
-                      Privacy Policy
+              <div className="container mx-auto flex flex-col items-center justify-center gap-4 px-4 md:flex-row md:justify-between text-sm text-muted-foreground">
+    
+                  {/* 版權宣告 */}
+                  <p className="text-center md:text-left">
+                    © {new Date().getFullYear()} Gratry Snow. All rights reserved.
+                  </p>
+                  {/* 連結區塊：加上 flex-wrap 允許手機版自動換行，並用 justify-center 讓換行後也能置中 */}
+                  <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+                    <a 
+                      href="https://github.com/chienhsiang-hung/gratry-snow/issues" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-foreground transition-colors whitespace-nowrap"
+                    >
+                      {t('issues')}
+                    </a>
+                    <a 
+                      href="https://github.com/chienhsiang-hung/gratry-snow/discussions" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground transition-colors whitespace-nowrap"
+                    >
+                      {t('discussions')}
+                    </a>
+                    <Link href="/privacy" className="hover:text-foreground transition-colors whitespace-nowrap">
+                      {t('privacy')}
                     </Link>
-                    <Link href="/terms" className="hover:text-foreground transition-colors">
-                      Terms of Service
+                    <Link href="/terms" className="hover:text-foreground transition-colors whitespace-nowrap">
+                      {t('terms')}
                     </Link>
                   </div>
                 </div>

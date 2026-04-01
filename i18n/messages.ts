@@ -24,6 +24,10 @@ const translations = {
   },
   profile: { en: 'Profile', zh: '個人資料' },
   tricks: { en: 'Tricks', zh: '收藏招式' },
+  issues: { en: 'Report Issue', zh: '問題回報' },
+  discussions: { en: 'Discussions', zh: '討論區' },
+  privacy: { en: 'Privacy Policy', zh: '隱私政策' },
+  terms: { en: 'Terms of Service', zh: '服務條款' },
 
   // =================================================================
   // Common Actions & Labels
