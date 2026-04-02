@@ -14,6 +14,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useTranslations } from 'next-intl';
 import { SkillNode } from '@/components/tricks/skill-node';
+import { useTheme } from 'next-themes';
 
 // 定義自定義節點類型
 const nodeTypes = {
@@ -63,6 +64,10 @@ export default function SkillTreePage() {
     [setEdges]
   );
 
+  const { theme, systemTheme } = useTheme();
+  // 處理 'system' 模式，確保在跟隨系統時也能正確對應
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full">
       <div className="p-6 bg-background border-b">
@@ -79,6 +84,7 @@ export default function SkillTreePage() {
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           proOptions={ {hideAttribution: true} }
+          colorMode={currentTheme === 'dark' ? 'dark' : 'light'}
           fitView
         >
           <Background gap={20} color="#888" />
