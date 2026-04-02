@@ -283,34 +283,38 @@ export default function SkillTreePage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full relative">
-      <div className="flex justify-between items-center p-6 bg-background border-b z-10 shadow-sm">
+      
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 p-4 md:p-6 bg-background border-b z-10 shadow-sm">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">{t('skill_tree')}</h1>
-          <p className="text-muted-foreground">{t('skill_tree_desc')}</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">{t('skill_tree')}</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">{t('skill_tree_desc')}</p>
         </div>
         
-        {/* 控制按鈕區 */}
-        <div className="flex gap-2">
+        {/* 控制按鈕區：手機版會自動換行並填滿寬度，電腦版則靠右對齊 */}
+        <div className="flex w-full md:w-auto gap-2">
           {!isEditing ? (
-            <Button onClick={handleEdit} variant="outline" className="gap-2">
+            <Button onClick={handleEdit} variant="outline" className="gap-2 w-full md:w-auto">
               <Pencil className="w-4 h-4" />
               {t('edit')}
             </Button>
           ) : (
-            <>
-              <Button onClick={handleCancel} variant="ghost" className="gap-2" disabled={isSaving}>
-                <X className="w-4 h-4" />
-                {t('cancel')}
+            // 編輯模式下的三個按鈕：手機版使用 grid 切成三等份，電腦版改回 flex
+            <div className="grid grid-cols-3 gap-2 w-full md:flex md:w-auto">
+              <Button onClick={handleCancel} variant="ghost" className="gap-1.5 md:gap-2 px-1 md:px-4" disabled={isSaving}>
+                <X className="w-4 h-4 shrink-0" />
+                <span className="text-xs md:text-sm whitespace-nowrap">{t('cancel')}</span>
               </Button>
-              <Button onClick={() => setNodes(initialNodes)} variant="outline" className="gap-2 text-destructive border-destructive hover:bg-destructive/10" disabled={isSaving}>
-                <RotateCcw className="w-4 h-4" />
-                {t('reset')}
+              
+              <Button onClick={() => setNodes(initialNodes)} variant="outline" className="gap-1.5 md:gap-2 px-1 md:px-4 text-destructive border-destructive hover:bg-destructive/10" disabled={isSaving}>
+                <RotateCcw className="w-4 h-4 shrink-0" />
+                <span className="text-xs md:text-sm whitespace-nowrap">{t('reset')}</span>
               </Button>
-              <Button onClick={handleSave} className="gap-2" disabled={isSaving}>
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {isSaving ? t('saving') : t('save')}
+              
+              <Button onClick={handleSave} className="gap-1.5 md:gap-2 px-1 md:px-4" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" /> : <Save className="w-4 h-4 shrink-0" />}
+                <span className="text-xs md:text-sm whitespace-nowrap">{isSaving ? t('saving') : t('save')}</span>
               </Button>
-            </>
+            </div>
           )}
         </div>
       </div>
