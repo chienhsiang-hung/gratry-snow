@@ -48,6 +48,9 @@ const translations = {
   speed: { en: 'Speed', zh: '速度' },
   status: { en: 'Status', zh: '狀態' },
   active: { en: 'Active', zh: '活躍' },
+  edit: { en: 'Edit', zh: '編輯' },
+  reset: { en: 'Reset', zh: '重置位置' },
+  save_success: { en: 'Skill tree saved successfully!', zh: '技能樹儲存成功！' },
 
   // =================================================================
   // Authentication

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ReactFlow,
   useNodesState,
@@ -18,6 +18,10 @@ import { useTranslations } from 'next-intl';
 import { SkillNode } from '@/components/tricks/skill-node';
 import { GroupNode } from '@/components/tricks/group-node';
 import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
+import { Pencil, Save, X, RotateCcw, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+// import { createClient } from '@/lib/supabase/client';
 
 export interface TrickStatus {
   isUnlocked: boolean;
@@ -55,6 +59,14 @@ export default function SkillTreePage() {
   const t = useTranslations();
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
+
+  // 狀態管理
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // 備份進入編輯模式前的原始狀態
+  const [originalNodes, setOriginalNodes] = useState<AppNode[]>([]);
 
   const initialNodes: AppNode[] = useMemo(() => [
     // Layer 1: Foundation
@@ -141,6 +153,30 @@ export default function SkillTreePage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
+  // 1. 初次載入資料庫資料 (Mock)
+  useEffect(() => {
+    const fetchTreeData = async () => {
+      setIsLoading(true);
+      try {
+        // TODO: 連接 Supabase，根據目前 User ID 抓取資料
+        // const supabase = createClient();
+        // const { data, error } = await supabase.from('user_skill_tree').select('tree_data').single();
+        // if (data && data.tree_data) {
+        //   // 將資料庫的狀態與座標蓋過 initialNodes
+        //   setNodes(mergeNodesWithDbData(initialNodes, data.tree_data));
+        // }
+        
+        // 暫時模擬載入延遲
+        setTimeout(() => setIsLoading(false), 500); 
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
+      }
+    };
+    fetchTreeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleStatusChange = useCallback((id: string, newStatus: Partial<TrickStatus>) => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -149,10 +185,7 @@ export default function SkillTreePage() {
             ...node, 
             data: { 
               ...node.data, 
-              status: { 
-                ...(node.data.status as TrickStatus), 
-                ...newStatus 
-              } 
+              status: { ...(node.data.status as TrickStatus), ...newStatus } 
             } 
           };
         }
@@ -161,17 +194,27 @@ export default function SkillTreePage() {
     );
   }, [setNodes]);
 
+  // 2. 將 isEditing 狀態與 onStatusChange 綁定到所有 Node
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => {
-        if (node.type === 'skill' && !node.data.onStatusChange) {
-          return { ...node, data: { ...node.data, id: node.id, onStatusChange: handleStatusChange } };
+        if (node.type === 'skill') {
+          return { 
+            ...node, 
+            data: { 
+              ...node.data, 
+              id: node.id, 
+              isEditing, // 動態更新編輯狀態
+              onStatusChange: handleStatusChange 
+            } 
+          };
         }
         return node;
       })
     );
-  }, [handleStatusChange, setNodes]);
+  }, [handleStatusChange, isEditing, setNodes]);
 
+  // 3. 計算連線狀態
   useEffect(() => {
     const updatedEdges = rawEdges.map((edge) => {
       const sourceNode = nodes.find((n) => n.id === edge.source);
@@ -195,11 +238,81 @@ export default function SkillTreePage() {
     [setEdges]
   );
 
+  // --- 按鈕動作 ---
+  const handleEdit = () => {
+    setOriginalNodes([...nodes]); // 備份當前狀態與座標
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setNodes(originalNodes); // 還原狀態與座標
+    setIsEditing(false);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // 提取需要儲存的資料 (只存 ID, Status, Position 以節省空間)
+      const dataToSave = nodes.map(n => ({
+        id: n.id,
+        position: n.position,
+        status: n.data.status
+      }));
+
+      // TODO: 寫入 Supabase
+      // const supabase = createClient();
+      // const { error } = await supabase.from('user_skill_tree').upsert({
+      //   user_id: user.id, // 記得換成你的 user 邏輯
+      //   tree_data: dataToSave
+      // });
+      // if(error) throw error;
+
+      await new Promise(resolve => setTimeout(resolve, 800)); // 模擬儲存時間
+      toast.success(t('save_success', { fallback: 'Skill tree saved successfully!' }));
+      setIsEditing(false);
+    } catch (err) {
+      toast.error('Failed to save.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="flex h-[calc(100vh-64px)] items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] w-full">
-      <div className="p-6 bg-background border-b">
-        <h1 className="text-3xl font-extrabold tracking-tight">{t('skill_tree')}</h1>
-        <p className="text-muted-foreground">{t('skill_tree_desc')}</p>
+    <div className="flex flex-col h-[calc(100vh-64px)] w-full relative">
+      <div className="flex justify-between items-center p-6 bg-background border-b z-10 shadow-sm">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight">{t('skill_tree')}</h1>
+          <p className="text-muted-foreground">{t('skill_tree_desc')}</p>
+        </div>
+        
+        {/* 控制按鈕區 */}
+        <div className="flex gap-2">
+          {!isEditing ? (
+            <Button onClick={handleEdit} variant="outline" className="gap-2">
+              <Pencil className="w-4 h-4" />
+              {t('edit')}
+            </Button>
+          ) : (
+            <>
+              <Button onClick={handleCancel} variant="ghost" className="gap-2" disabled={isSaving}>
+                <X className="w-4 h-4" />
+                {t('cancel')}
+              </Button>
+              <Button onClick={() => setNodes(initialNodes)} variant="outline" className="gap-2 text-destructive border-destructive hover:bg-destructive/10" disabled={isSaving}>
+                <RotateCcw className="w-4 h-4" />
+                {t('reset')}
+              </Button>
+              <Button onClick={handleSave} className="gap-2" disabled={isSaving}>
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {isSaving ? t('saving') : t('save')}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 w-full bg-zinc-50 dark:bg-zinc-950">
@@ -212,10 +325,13 @@ export default function SkillTreePage() {
           nodeTypes={nodeTypes}
           proOptions={{ hideAttribution: true }}
           colorMode={currentTheme === 'dark' ? 'dark' : 'light'}
+          nodesDraggable={isEditing} // 根據 isEditing 決定是否可以拖曳節點
+          nodesConnectable={false}   // 假設不開放玩家自行拉線
+          elementsSelectable={isEditing}
           fitView
         >
           <Background gap={20} color="#888" />
-          <Controls />
+          <Controls showInteractive={false} />
         </ReactFlow>
       </div>
     </div>
