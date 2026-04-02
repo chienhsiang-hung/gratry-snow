@@ -109,7 +109,7 @@ export default function SkillTreePage() {
     { id: 'e-fnps-sone', source: 'fnps', target: 'sone' },
     { id: 'e-fnc-owen', source: 'fnc', target: 'owen' },
     { id: 'e-pivot-andy', source: 'pivot', target: 'andy' },
-    { id: 'e-nollie-kamikaze', source: 'nollie', target: 'kamikaze' },
+    { id: 'e-ollie-kamikaze', source: 'ollie', target: 'kamikaze' },
     { id: 'e-shifty-rewind', source: 'shifty', target: 'rewind' },
     { id: 'e-andy-spin540', source: 'andy', target: 'spin540' },
     { id: 'e-spin360-spin540', source: 'spin360', target: 'spin540' },
