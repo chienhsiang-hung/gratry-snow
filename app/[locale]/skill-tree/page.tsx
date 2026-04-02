@@ -27,9 +27,56 @@ const nodeTypes = {
 // 初始預設樹狀結構 (參考你的 Vue Flow 資料)
 const initialNodes: Node[] = [
   {
+    id: 'group-press',
+    type: 'group',
+    position: { x: 0, y: -400 },
+    style: { width: 760, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
+    data: { label: 'Press' }
+  },
+  { 
+    id: 'fnp', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press', extent: 'parent',
+    data: { label: 'Frontside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'bnp', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press', extent: 'parent',
+    data: { label: 'Backside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'ftp', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press', extent: 'parent',
+    data: { label: 'Frontside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'btp', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press', extent: 'parent',
+    data: { label: 'Backside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  {
+    id: 'group-press-spin',
+    type: 'group',
+    position: { x: 0, y: -200 },
+    style: { width: 760, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
+    data: { label: 'Press Spin' }
+  },
+  { 
+    id: 'fnps', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    data: { label: 'Frontside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'bnps', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    data: { label: 'Backside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'ftps', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    data: { label: 'Frontside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'btps', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    data: { label: 'Backside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+
+  {
     id: 'group-balance',
     type: 'group',
-    position: { x: 0, y: 0 },
+    position: { x: 50, y: 100 },
     style: { width: 580, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
     data: { label: 'Balance' }
   },
@@ -60,6 +107,10 @@ const initialNodes: Node[] = [
 ];
 
 const initialEdges = [
+  { id: 'e-fnp-fnps', source: 'fnp', target: 'fnps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
+  { id: 'e-bnp-bnps', source: 'bnp', target: 'bnps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
+  { id: 'e-ftp-ftps', source: 'ftp', target: 'ftps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
+  { id: 'e-btp-btps', source: 'btp', target: 'btps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-press-backNose', source: 'press', target: 'backNose', animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-press-frontTail', source: 'press', target: 'frontTail', animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
 ];

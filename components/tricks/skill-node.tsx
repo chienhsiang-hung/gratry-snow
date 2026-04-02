@@ -1,7 +1,7 @@
 'use client'
 
 import { Handle, Position } from '@xyflow/react';
-import { Video, Lock, Star } from 'lucide-react';
+import { Video, Lock, Star, Infinity } from 'lucide-react';
 
 export function SkillNode({ data }: { data: any }) {
   const { label, status } = data;
@@ -20,6 +20,14 @@ export function SkillNode({ data }: { data: any }) {
     <div className={`relative px-4 py-3 rounded-xl bg-card border-2 transition-all duration-300 ${nodeStyle}`}>
       <Handle type="target" position={Position.Top} className="w-2 h-2 !bg-primary" />
       
+      {/* 專精專屬徽章 */}
+      {status.bothSides && (
+        <div className="absolute -top-2.5 -right-2.5 bg-amber-400 text-amber-950 rounded-full p-1 shadow-[0_0_8px_rgba(251,191,36,0.6)] border-2 border-card">
+          {/* 使用 Infinity 代表兩邊無死角，或使用 Zap(閃電) */}
+          <Infinity className="w-3.5 h-3.5" strokeWidth={3} />
+        </div>
+      )}
+
       <div className="flex flex-col items-center min-w-[100px]">
         {/* 如果是滿級，文字也可以考慮加上一點金色 */}
         <div className={`text-sm font-bold mb-2 tracking-tight ${status.bothSides ? 'text-amber-500' : ''}`}>
