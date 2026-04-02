@@ -15,11 +15,13 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useTranslations } from 'next-intl';
 import { SkillNode } from '@/components/tricks/skill-node';
+import { GroupNode } from '@/components/tricks/group-node';
 import { useTheme } from 'next-themes';
 
 // 定義自定義節點類型
 const nodeTypes = {
   skill: SkillNode,
+  group: GroupNode,
 };
   
 // 初始預設樹狀結構 (參考你的 Vue Flow 資料)
@@ -28,19 +30,19 @@ const initialNodes: Node[] = [
     id: 'group-balance',
     type: 'group',
     position: { x: 0, y: 0 },
-    style: { width: 580, height: 120, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
+    style: { width: 580, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
     data: { label: 'Balance' }
   },
   { 
-    id: 'sone', type: 'skill', position: { x: 40, y: 20 }, parentId: 'group-balance', extent: 'parent',
+    id: 'sone', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-balance', extent: 'parent',
     data: { label: 'Sone', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'ds', type: 'skill', position: { x: 220, y: 20 }, parentId: 'group-balance', extent: 'parent',
+    id: 'ds', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-balance', extent: 'parent',
     data: { label: 'Drive Spin', status: { isUnlocked: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'owen', type: 'skill', position: { x: 400, y: 20 }, parentId: 'group-balance', extent: 'parent',
+    id: 'owen', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-balance', extent: 'parent',
     data: { label: 'Owen', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 

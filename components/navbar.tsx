@@ -35,7 +35,7 @@ export default function Navbar() {
   return (
     // 優化 1：加強毛玻璃效果（調低背景不透明度），並加入由上往下的進場動畫
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/70 backdrop-blur-md transition-all duration-300 animate-in fade-in slide-in-from-top-8 ease-out supports-[backdrop-filter]:bg-background/50">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="flex h-16 items-center justify-between px-4">
         
         <div className="flex items-center gap-3">
           {/* 手機版：漢堡選單 */}
