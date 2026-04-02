@@ -280,25 +280,56 @@ const translations = {
   node_private: { en: 'Private', zh: '私人' },
   node_favorite: { en: 'Favorite', zh: '收藏' },
 
-  // --- Tricks Dictionary (招式名稱字典) ---
+  // =================================================================
+  // Skill Tree Groups (技能樹分類)
+  // =================================================================
+  group_foundation: { en: 'Foundation', zh: '基礎地基 (Foundation)' },
+  group_press: { en: 'Press', zh: '壓板平衡 (Press)' },
+  group_180: { en: '180s & Pivots', zh: '入門旋轉 (180 & Pivot)' },
+  group_press_spin: { en: 'Press Spin', zh: '乘載旋轉 (Press Spin)' },
+  group_compass: { en: 'Compass & Tripod', zh: '圓規與三腳架 (Compass)' },
+  group_classic: { en: 'Classic Buttering', zh: '經典平花 (Classic)' },
+  group_advanced: { en: 'Advanced Combos', zh: '高階複合招式 (Advanced)' },
+  group_spin: { en: 'High Spins', zh: '空中與高旋轉 (High Spins)' },
+
+  // =================================================================
+  // Tricks Dictionary (招式名稱字典)
+  // =================================================================
   trick_switch: { en: 'Switch Riding', zh: '反腳滑行 (Switch)' },
   trick_hop: { en: 'Hop', zh: '原地跳躍 (Hop)' },
   trick_ollie: { en: 'Ollie', zh: '豚跳 (Ollie)' },
   trick_nollie: { en: 'Nollie', zh: '反豚跳 (Nollie)' },
-  trick_fs180: { en: 'FS 180', zh: '內轉 180 (FS 180)' },
-  trick_bs180: { en: 'BS 180', zh: '外轉 180 (BS 180)' },
-  trick_pivot: { en: 'Pivot', zh: '板心旋轉 (Pivot)' },
-  trick_revert: { en: 'Revert', zh: '回轉 (Revert)' },
+  
   trick_fnp: { en: 'FS Nose Press', zh: '前刃壓板頭 (FS Nose)' },
   trick_bnp: { en: 'BS Nose Press', zh: '後刃壓板頭 (BS Nose)' },
   trick_ftp: { en: 'FS Tail Press', zh: '前刃壓板尾 (FS Tail)' },
   trick_btp: { en: 'BS Tail Press', zh: '後刃壓板尾 (BS Tail)' },
+  
+  trick_fs180: { en: 'FS 180', zh: '內轉 180 (FS 180)' },
+  trick_bs180: { en: 'BS 180', zh: '外轉 180 (BS 180)' },
+  trick_pivot: { en: 'Pivot', zh: '板心旋轉 (Pivot)' },
+  trick_revert: { en: 'Revert', zh: '回轉 (Revert)' },
+  
+  trick_fnps: { en: 'FS Nose Spin', zh: '前刃板頭轉 (FNPS)' },
+  trick_bnps: { en: 'BS Nose Spin', zh: '後刃板頭轉 (BNPS)' },
+  trick_ftps: { en: 'FS Tail Spin', zh: '前刃板尾轉 (FTPS)' },
+  trick_btps: { en: 'BS Tail Spin', zh: '後刃板尾轉 (BTPS)' },
+
+  trick_fnc: { en: 'FS Nose Compass', zh: '前刃板頭圓規 (FNC)' },
+  trick_bnc: { en: 'BS Nose Compass', zh: '後刃板頭圓規 (BNC)' },
+  trick_ftc: { en: 'FS Tail Compass', zh: '前刃板尾圓規 (FTC)' },
+  trick_tripod: { en: 'Tripod', zh: '三腳架 (Tripod)' },
+  
+  trick_mfm: { en: 'MFM Butter', zh: 'MFM 平花' },
+  trick_sone: { en: 'Sone', zh: 'ソネ (Sone)' },
+  trick_ds: { en: 'Drive Spin', zh: '驅動旋轉 (Drive Spin)' },
+  trick_shifty: { en: 'Shifty', zh: '空中扭腰 (Shifty)' },
+  
   trick_owen: { en: 'Owen', zh: '歐文 (Owen)' },
   trick_andy: { en: 'Andy', zh: '安迪 (Andy)' },
-  trick_mfm: { en: 'MFM Butter', zh: 'MFM 平花 (MFM)' },
   trick_kamikaze: { en: 'Kamikaze', zh: '神風 (Kamikaze)' },
-  trick_shifty: { en: 'Shifty', zh: '空中扭腰 (Shifty)' },
-  trick_ds: { en: 'Drive Spin', zh: '驅動旋轉 (Drive Spin)' },
+  trick_rewind: { en: 'Rewind', zh: '倒帶/反拉 (Rewind)' },
+  trick_bside: { en: 'B-Side Spins', zh: '背面/反刃起跳 (B-side)' },
 };
 
 export type Locale = 'en' | 'zh';
