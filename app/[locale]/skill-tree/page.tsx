@@ -34,20 +34,39 @@ const initialNodes: Node[] = [
     data: { label: 'Press' }
   },
   { 
-    id: 'fnp', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press', extent: 'parent',
+    id: 'fnp', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press',
     data: { label: 'Frontside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'bnp', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press', extent: 'parent',
+    id: 'bnp', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press',
     data: { label: 'Backside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'ftp', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press', extent: 'parent',
+    id: 'ftp', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press',
     data: { label: 'Frontside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'btp', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press', extent: 'parent',
+    id: 'btp', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press',
     data: { label: 'Backside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'hop', type: 'skill', position: { x: 925, y: -400 },
+    data: { label: 'Hop', status: { isUnlocked: false, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  {
+    id: 'group-sj',
+    type: 'group',
+    position: { x: 800, y: -300 },
+    style: { width: 400, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
+    data: { label: 'Small Jump (Non-directional)' }
+  },
+  { 
+    id: 'ollie', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-sj',
+    data: { label: 'Ollie', status: { isUnlocked: false, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'nollie', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-sj',
+    data: { label: 'Nollie', status: { isUnlocked: false, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   {
     id: 'group-press-spin',
@@ -57,62 +76,72 @@ const initialNodes: Node[] = [
     data: { label: 'Press Spin' }
   },
   { 
-    id: 'fnps', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    id: 'fnps', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-press-spin',
     data: { label: 'Frontside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'bnps', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    id: 'bnps', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-press-spin',
     data: { label: 'Backside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'ftps', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    id: 'ftps', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-press-spin',
     data: { label: 'Frontside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'btps', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press-spin', extent: 'parent',
+    id: 'btps', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-press-spin',
     data: { label: 'Backside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
-
+  {
+    id: 'group-compass',
+    type: 'group',
+    position: { x: 0, y: 0 },
+    style: { width: 760, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
+    data: { label: 'Compass' }
+  },
+  { 
+    id: 'fnc', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-compass',
+    data: { label: 'Frontside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'bnc', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-compass',
+    data: { label: 'Backside Nose', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'ftc', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-compass',
+    data: { label: 'Frontside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'btc', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-compass',
+    data: { label: 'Backside Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
   {
     id: 'group-balance',
     type: 'group',
-    position: { x: 50, y: 100 },
+    position: { x: 350, y: 0 },
     style: { width: 580, height: 150, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '2px dashed var(--border)', borderRadius: '1rem' },
     data: { label: 'Balance' }
   },
   { 
-    id: 'sone', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-balance', extent: 'parent',
+    id: 'sone', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-balance',
     data: { label: 'Sone', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'ds', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-balance', extent: 'parent',
+    id: 'ds', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-balance',
     data: { label: 'Drive Spin', status: { isUnlocked: true, bothSides: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
   },
   { 
-    id: 'owen', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-balance', extent: 'parent',
+    id: 'owen', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-balance',
     data: { label: 'Owen', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
   },
-  { 
-    id: 'press', type: 'skill', position: { x: 400, y: 0 },
-    data: { label: 'Nose / Tail Press', status: { isUnlocked: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
-  },
-  { 
-    id: 'backNose', type: 'skill', position: { x: 200, y: 150 },
-    data: { label: 'Back Nose', status: { isUnlocked: false, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
-  },
-  { 
-    id: 'frontTail', type: 'skill', position: { x: 600, y: 150 },
-    data: { label: 'Front Tail', status: { isUnlocked: true, hasPublic: false, hasPrivate: true, hasFavorite: true } } 
-  }
 ];
 
 const initialEdges = [
+  { id: 'e-group-press-group-sj', source: 'group-press', target: 'group-sj', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
+  { id: 'e-hop-group-sj', source: 'hop', target: 'group-sj', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-fnp-fnps', source: 'fnp', target: 'fnps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-bnp-bnps', source: 'bnp', target: 'bnps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-ftp-ftps', source: 'ftp', target: 'ftps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
   { id: 'e-btp-btps', source: 'btp', target: 'btps', animated: false, markerEnd: { type: MarkerType.ArrowClosed } },
-  { id: 'e-press-backNose', source: 'press', target: 'backNose', animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
-  { id: 'e-press-frontTail', source: 'press', target: 'frontTail', animated: true, markerEnd: { type: MarkerType.ArrowClosed } },
 ];
 
 export default function SkillTreePage() {
