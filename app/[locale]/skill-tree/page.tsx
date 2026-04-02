@@ -23,6 +23,18 @@ const nodeTypes = {
 // 初始預設樹狀結構 (參考你的 Vue Flow 資料)
 const initialNodes = [
   { 
+    id: 'sone', type: 'skill', position: { x: -200, y: 0 },
+    data: { label: 'Sone', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'ds', type: 'skill', position: { x: 0, y: 0 },
+    data: { label: 'Drive Spin', status: { isUnlocked: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
+    id: 'owen', type: 'skill', position: { x: 200, y: 0 },
+    data: { label: 'Owen', status: { isUnlocked: true, hasPublic: false, hasPrivate: false, hasFavorite: false } } 
+  },
+  { 
     id: 'press', type: 'skill', position: { x: 400, y: 0 },
     data: { label: 'Nose / Tail Press', status: { isUnlocked: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
   },
