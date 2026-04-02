@@ -39,7 +39,7 @@ const initialNodes: Node[] = [
   },
   { 
     id: 'ds', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-balance', extent: 'parent',
-    data: { label: 'Drive Spin', status: { isUnlocked: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
+    data: { label: 'Drive Spin', status: { isUnlocked: true, bothSides: true, hasPublic: true, hasPrivate: false, hasFavorite: false } } 
   },
   { 
     id: 'owen', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-balance', extent: 'parent',
