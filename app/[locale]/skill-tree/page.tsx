@@ -19,13 +19,31 @@ import { SkillNode } from '@/components/tricks/skill-node';
 import { GroupNode } from '@/components/tricks/group-node';
 import { useTheme } from 'next-themes';
 
+export interface TrickStatus {
+  isUnlocked: boolean;
+  bothSides: boolean;
+  hasPublic: boolean;
+  hasPrivate: boolean;
+  hasFavorite: boolean;
+}
+
+export interface TrickNodeData extends Record<string, unknown> {
+  label: string;
+  status?: TrickStatus; // Group 節點沒有 status，所以設為可選
+  id?: string;
+  onStatusChange?: (id: string, newStatus: Partial<TrickStatus>) => void;
+}
+
+type AppNode = Node<TrickNodeData>;
+
 const nodeTypes = {
   skill: SkillNode,
   group: GroupNode,
 };
 
+// 為了容納第 5 個招式 (x: 760)，將群組寬度加寬至 940
 const groupStyle = { 
-  width: 760, height: 150, 
+  width: 940, height: 150, 
   backgroundColor: 'rgba(255, 255, 255, 0.05)', 
   border: '2px dashed var(--border)', borderRadius: '1rem' 
 };
@@ -38,7 +56,7 @@ export default function SkillTreePage() {
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
 
-  const initialNodes: Node[] = useMemo(() => [
+  const initialNodes: AppNode[] = useMemo(() => [
     // Layer 1: Foundation
     { id: 'group-foundation', type: 'group', position: { x: 0, y: -800 }, style: groupStyle, data: { label: t('group_foundation') } },
     { id: 'switch', type: 'skill', position: { x: 40, y: 60 }, parentId: 'group-foundation', data: { label: t('trick_switch'), status: defaultStatus() } },
@@ -87,6 +105,7 @@ export default function SkillTreePage() {
     { id: 'andy', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_andy'), status: defaultStatus() } },
     { id: 'kamikaze', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_kamikaze'), status: defaultStatus() } },
     { id: 'rewind', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_rewind'), status: defaultStatus() } },
+    { id: 'tochi', type: 'skill', position: { x: 760, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_tochi'), status: defaultStatus() } }, // 加入 Tochi
 
     // Layer 8: High Spins
     { id: 'group-spin', type: 'group', position: { x: 0, y: 600 }, style: groupStyle, data: { label: t('group_spin') } },
@@ -109,21 +128,32 @@ export default function SkillTreePage() {
     { id: 'e-fnps-sone', source: 'fnps', target: 'sone' },
     { id: 'e-fnc-owen', source: 'fnc', target: 'owen' },
     { id: 'e-pivot-andy', source: 'pivot', target: 'andy' },
-    { id: 'e-ollie-kamikaze', source: 'ollie', target: 'kamikaze' },
+    { id: 'e-ollie-kamikaze', source: 'ollie', target: 'kamikaze' }, // 根據你的修改保留
     { id: 'e-shifty-rewind', source: 'shifty', target: 'rewind' },
+    { id: 'e-sone-tochi', source: 'sone', target: 'tochi' }, // 將 Sone 的點板發力延伸至 Tochi
     { id: 'e-andy-spin540', source: 'andy', target: 'spin540' },
     { id: 'e-spin360-spin540', source: 'spin360', target: 'spin540' },
     { id: 'e-spin540-spin720', source: 'spin540', target: 'spin720' },
   ], []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const handleStatusChange = useCallback((id: string, newStatus: any) => {
+  // 6. 為 newStatus 加上型別，並使用 as 斷言告訴 TS 這是安全的
+  const handleStatusChange = useCallback((id: string, newStatus: Partial<TrickStatus>) => {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === id) {
-          return { ...node, data: { ...node.data, status: { ...node.data.status, ...newStatus } } };
+          return { 
+            ...node, 
+            data: { 
+              ...node.data, 
+              status: { 
+                ...(node.data.status as TrickStatus), // 關鍵修改：斷言為 TrickStatus 才能展開
+                ...newStatus 
+              } 
+            } 
+          };
         }
         return node;
       })

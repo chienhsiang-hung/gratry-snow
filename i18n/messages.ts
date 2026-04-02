@@ -330,6 +330,8 @@ const translations = {
   trick_kamikaze: { en: 'Kamikaze', zh: '神風 (Kamikaze)' },
   trick_rewind: { en: 'Rewind', zh: '倒帶/反拉 (Rewind)' },
   trick_bside: { en: 'B-Side Spins', zh: '背面/反刃起跳 (B-side)' },
+
+  trick_tochi: { en: 'Tochi', zh: 'Tochi (トチ)' },
 };
 
 export type Locale = 'en' | 'zh';
