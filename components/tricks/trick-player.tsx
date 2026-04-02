@@ -5,11 +5,14 @@ import YouTube, { YouTubeEvent, YouTubePlayer } from 'react-youtube';
 import { Button } from '@/components/ui/button';
 import { FlipHorizontal, VolumeX, Volume2, Play, Pause, ExternalLink } from 'lucide-react';
 import { SiInstagram } from "react-icons/si"; 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { InstagramEmbed } from 'react-social-media-embed';
+import Script from 'next/script';
 
 export function TrickPlayer({ videoId, videoType='youtube' }: { videoId: string, videoType?: string }) {
   const t = useTranslations();
+  const locale = useLocale();
+
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMirrored, setIsMirrored] = useState(false);
@@ -22,6 +25,7 @@ export function TrickPlayer({ videoId, videoType='youtube' }: { videoId: string,
 
   // 🚀 新增：用來判斷是否為直式影片 (Shorts/Reels)
   const [isVertical, setIsVertical] = useState(false);
+  const igLocale = locale.includes('zh') ? 'zh_TW' : 'en_US';
 
   // 🚀 新增：透過 YouTube oEmbed API 獲取影片原始比例
   useEffect(() => {
@@ -151,7 +155,7 @@ export function TrickPlayer({ videoId, videoType='youtube' }: { videoId: string,
     // 順便加上 max-w-[400px] 與 mx-auto，避免在電腦版上被拉得太巨大
     return (
       <div className="flex justify-center w-full max-w-[400px] mx-auto bg-black rounded-2xl overflow-hidden aspect-[9/16] shadow-xl">
-        <InstagramEmbed url={videoId} width="100%" />
+        <InstagramEmbed url={videoId} width="100%" linkText={t('view_on_ig')} />
       </div>
     );
   }

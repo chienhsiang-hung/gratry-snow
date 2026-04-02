@@ -272,6 +272,13 @@ const translations = {
     en: 'This is a private link shared with you. 🏂',
     zh: '這是一個專屬的私人分享連結 🏂'
   },
+
+  // --- Skill Tree ---
+  skill_tree: { en: 'Skill Tree', zh: '技能樹' },
+  skill_tree_desc: { en: 'Visualize your progress and build your own combo paths.', zh: '視覺化你的練習進度，並建立專屬的連招路線。' },
+  node_public: { en: 'Public', zh: '公開' },
+  node_private: { en: 'Private', zh: '私人' },
+  node_favorite: { en: 'Favorite', zh: '收藏' },
 };
 
 export type Locale = 'en' | 'zh';
