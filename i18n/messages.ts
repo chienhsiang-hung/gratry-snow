@@ -279,6 +279,26 @@ const translations = {
   node_public: { en: 'Public', zh: '公開' },
   node_private: { en: 'Private', zh: '私人' },
   node_favorite: { en: 'Favorite', zh: '收藏' },
+
+  // --- Tricks Dictionary (招式名稱字典) ---
+  trick_switch: { en: 'Switch Riding', zh: '反腳滑行 (Switch)' },
+  trick_hop: { en: 'Hop', zh: '原地跳躍 (Hop)' },
+  trick_ollie: { en: 'Ollie', zh: '豚跳 (Ollie)' },
+  trick_nollie: { en: 'Nollie', zh: '反豚跳 (Nollie)' },
+  trick_fs180: { en: 'FS 180', zh: '內轉 180 (FS 180)' },
+  trick_bs180: { en: 'BS 180', zh: '外轉 180 (BS 180)' },
+  trick_pivot: { en: 'Pivot', zh: '板心旋轉 (Pivot)' },
+  trick_revert: { en: 'Revert', zh: '回轉 (Revert)' },
+  trick_fnp: { en: 'FS Nose Press', zh: '前刃壓板頭 (FS Nose)' },
+  trick_bnp: { en: 'BS Nose Press', zh: '後刃壓板頭 (BS Nose)' },
+  trick_ftp: { en: 'FS Tail Press', zh: '前刃壓板尾 (FS Tail)' },
+  trick_btp: { en: 'BS Tail Press', zh: '後刃壓板尾 (BS Tail)' },
+  trick_owen: { en: 'Owen', zh: '歐文 (Owen)' },
+  trick_andy: { en: 'Andy', zh: '安迪 (Andy)' },
+  trick_mfm: { en: 'MFM Butter', zh: 'MFM 平花 (MFM)' },
+  trick_kamikaze: { en: 'Kamikaze', zh: '神風 (Kamikaze)' },
+  trick_shifty: { en: 'Shifty', zh: '空中扭腰 (Shifty)' },
+  trick_ds: { en: 'Drive Spin', zh: '驅動旋轉 (Drive Spin)' },
 };
 
 export type Locale = 'en' | 'zh';
