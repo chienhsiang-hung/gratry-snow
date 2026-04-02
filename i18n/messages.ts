@@ -332,6 +332,7 @@ const translations = {
   trick_bside: { en: 'B-Side Spins', zh: '背面/反刃起跳 (B-side)' },
 
   trick_tochi: { en: 'Tochi', zh: 'Tochi (トチ)' },
+  trick_dolphin: { en: 'Dolphin Turn', zh: '海豚跳 (Dolphin)' },
 };
 
 export type Locale = 'en' | 'zh';

@@ -41,7 +41,7 @@ const nodeTypes = {
   group: GroupNode,
 };
 
-// 為了容納第 5 個招式 (x: 760)，將群組寬度加寬至 940
+// 寬度 940 剛好可以容納 5 個招式 (x: 40, 220, 400, 580, 760)
 const groupStyle = { 
   width: 940, height: 150, 
   backgroundColor: 'rgba(255, 255, 255, 0.05)', 
@@ -98,6 +98,7 @@ export default function SkillTreePage() {
     { id: 'sone', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-classic', data: { label: t('trick_sone'), status: defaultStatus() } },
     { id: 'ds', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-classic', data: { label: t('trick_ds'), status: defaultStatus() } },
     { id: 'shifty', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-classic', data: { label: t('trick_shifty'), status: defaultStatus() } },
+    { id: 'dolphin', type: 'skill', position: { x: 760, y: 60 }, parentId: 'group-classic', data: { label: t('trick_dolphin'), status: defaultStatus() } }, // 加入 Dolphin Turn
 
     // Layer 7: Advanced Combos
     { id: 'group-advanced', type: 'group', position: { x: 0, y: 400 }, style: groupStyle, data: { label: t('group_advanced') } },
@@ -105,7 +106,7 @@ export default function SkillTreePage() {
     { id: 'andy', type: 'skill', position: { x: 220, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_andy'), status: defaultStatus() } },
     { id: 'kamikaze', type: 'skill', position: { x: 400, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_kamikaze'), status: defaultStatus() } },
     { id: 'rewind', type: 'skill', position: { x: 580, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_rewind'), status: defaultStatus() } },
-    { id: 'tochi', type: 'skill', position: { x: 760, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_tochi'), status: defaultStatus() } }, // 加入 Tochi
+    { id: 'tochi', type: 'skill', position: { x: 760, y: 60 }, parentId: 'group-advanced', data: { label: t('trick_tochi'), status: defaultStatus() } },
 
     // Layer 8: High Spins
     { id: 'group-spin', type: 'group', position: { x: 0, y: 600 }, style: groupStyle, data: { label: t('group_spin') } },
@@ -119,6 +120,7 @@ export default function SkillTreePage() {
   const rawEdges: Edge[] = useMemo(() => [
     { id: 'e-ollie-fnp', source: 'ollie', target: 'fnp' },
     { id: 'e-nollie-fnp', source: 'nollie', target: 'fnp' },
+    { id: 'e-ollie-dolphin', source: 'ollie', target: 'dolphin' }, // 將 Ollie 連結至 Dolphin Turn
     { id: 'e-switch-fs180', source: 'switch', target: 'fs180' },
     { id: 'e-switch-bs180', source: 'switch', target: 'bs180' },
     { id: 'e-fnp-fnps', source: 'fnp', target: 'fnps' },
@@ -128,9 +130,9 @@ export default function SkillTreePage() {
     { id: 'e-fnps-sone', source: 'fnps', target: 'sone' },
     { id: 'e-fnc-owen', source: 'fnc', target: 'owen' },
     { id: 'e-pivot-andy', source: 'pivot', target: 'andy' },
-    { id: 'e-ollie-kamikaze', source: 'ollie', target: 'kamikaze' }, // 根據你的修改保留
+    { id: 'e-ollie-kamikaze', source: 'ollie', target: 'kamikaze' }, 
     { id: 'e-shifty-rewind', source: 'shifty', target: 'rewind' },
-    { id: 'e-sone-tochi', source: 'sone', target: 'tochi' }, // 將 Sone 的點板發力延伸至 Tochi
+    { id: 'e-nollie-tochi', source: 'nollie', target: 'tochi' },
     { id: 'e-andy-spin540', source: 'andy', target: 'spin540' },
     { id: 'e-spin360-spin540', source: 'spin360', target: 'spin540' },
     { id: 'e-spin540-spin720', source: 'spin540', target: 'spin720' },
@@ -139,7 +141,6 @@ export default function SkillTreePage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  // 6. 為 newStatus 加上型別，並使用 as 斷言告訴 TS 這是安全的
   const handleStatusChange = useCallback((id: string, newStatus: Partial<TrickStatus>) => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -149,7 +150,7 @@ export default function SkillTreePage() {
             data: { 
               ...node.data, 
               status: { 
-                ...(node.data.status as TrickStatus), // 關鍵修改：斷言為 TrickStatus 才能展開
+                ...(node.data.status as TrickStatus), 
                 ...newStatus 
               } 
             } 
