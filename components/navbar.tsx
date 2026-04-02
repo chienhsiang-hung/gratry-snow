@@ -5,7 +5,7 @@ import { Link, usePathname } from "@/i18n/routing";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import AuthButton from "@/components/auth-button";
-import { Menu, Home, Upload, Bug, MessageSquare } from "lucide-react";
+import { Menu, Home, Upload, Bug, MessageSquare, ListTree } from "lucide-react";
 import { SiGithub } from "react-icons/si"; 
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -27,6 +27,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/", label: t('home') || "Home", icon: Home },
     { href: "/upload", label: t('upload_trick'), icon: Upload },
+    { href: "/skill-tree", label: t('skill_tree') || "Skill Tree", icon: ListTree },
   ];
 
   const closeSheet = () => setIsOpen(false);
