@@ -249,6 +249,21 @@ export default function SkillTreePage() {
     setIsEditing(false);
   };
 
+  // 只重置座標，保留狀態
+  const handleResetPositions = () => {
+    setNodes((currentNodes) => 
+      currentNodes.map((node) => {
+        // 從 initialNodes 找出對應的原始節點設定
+        const initialNode = initialNodes.find((n) => n.id === node.id);
+        if (initialNode) {
+          // 只覆寫 position，保留其他所有屬性 (包含 data.status)
+          return { ...node, position: initialNode.position };
+        }
+        return node;
+      })
+    );
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -283,7 +298,7 @@ export default function SkillTreePage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full relative">
-      
+
       <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 p-4 md:p-6 bg-background border-b z-10 shadow-sm">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">{t('skill_tree')}</h1>
@@ -305,7 +320,7 @@ export default function SkillTreePage() {
                 <span className="text-xs md:text-sm whitespace-nowrap">{t('cancel')}</span>
               </Button>
               
-              <Button onClick={() => setNodes(initialNodes)} variant="outline" className="gap-1.5 md:gap-2 px-1 md:px-4 text-destructive border-destructive hover:bg-destructive/10" disabled={isSaving}>
+              <Button onClick={handleResetPositions} variant="outline" className="gap-1.5 md:gap-2 px-1 md:px-4 text-destructive border-destructive hover:bg-destructive/10" disabled={isSaving}>
                 <RotateCcw className="w-4 h-4 shrink-0" />
                 <span className="text-xs md:text-sm whitespace-nowrap">{t('reset')}</span>
               </Button>
