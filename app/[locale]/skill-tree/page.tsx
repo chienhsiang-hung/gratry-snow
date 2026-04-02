@@ -66,6 +66,7 @@ export default function SkillTreePage() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          proOptions={ {hideAttribution: true} }
           fitView
         >
           <Background gap={20} color="#888" />
